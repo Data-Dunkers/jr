@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Top Ten · Data Dunkers Junior</title>
-  <meta name="description" content="See today's and all-time top-ten leaderboards for shooting, reaction time, free throws, passing, finishing, and height.">
+  <meta name="description" content="See today's and all-time top-ten leaderboards for shooting, reaction time, free throws, passing, and finishing.">
   <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
       <div class="hero-copy">
         <div class="eyebrow">Friendly competition</div>
         <h1>Top <span>ten</span></h1>
-        <p class="hero-lead">Six leaderboards from the same class dataset. Switch between today and all-time, then see who is leading each challenge.</p>
+        <p class="hero-lead">Four leaderboards from the same class dataset. Switch between today and all-time, then see who is leading each challenge.</p>
         <div class="btn-row">
           <button type="button" class="btn btn-primary" id="todayButton">Today</button>
           <button type="button" class="btn btn-ghost" id="allTimeButton">All-time</button>
@@ -84,20 +84,9 @@
             </table>
           </div>
         </section>
-
-        <section class="leaderboard">
-          <h2>📏 Tallest</h2>
-          <p class="leaderboard-sub">Highest recorded height in centimetres.</p>
-          <div class="table-wrap">
-            <table id="heightTable">
-              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Height (cm)</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
       </div>
     </section>
-
+    <br>
     <div class="card card-yellow">
       <div class="card-title-row">
         <div>
@@ -249,7 +238,6 @@
         renderShooters(players);
         renderMeasurements(players, "reactionTable", "reaction_time_ms", true, "No reaction-time results yet.", function (value) { return value == null ? "—" : value + " ms"; });
         renderMeasurements(players, "passTable", "ten_pass_seconds", true, "No 10-pass times yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 2) + " s"; });
-        renderMeasurements(players, "heightTable", "height_cm", false, "No height measurements yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 1) + " cm"; });
         renderFinish(players);
         const complete = players.filter(function (player) { return player.completedShots && player.measurement; }).length;
         if (!players.length) {
