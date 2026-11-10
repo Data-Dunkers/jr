@@ -1621,3 +1621,7 @@ th.num {
     transition-duration: 0.001ms !important;
   }
 }
+
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; }
+.frac-num { padding: 0 0.3em 0.1em; border-bottom: 1.5px solid currentColor; }
+.frac-den { padding-top: 0.1em; }

@@ -36,35 +36,28 @@
     <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
 
     <section class="section">
-      <div class="card-grid two">
+      <div class="card-grid">
         <section class="leaderboard">
           <h2>🏀 Top shooters</h2>
           <p class="leaderboard-sub">Average shots made across all five distances. Only players with all five distances appear.</p>
           <div class="table-wrap">
             <table id="shootersTable">
-              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Average</th><th class="num">Total</th><th class="num">2 ft</th><th class="num">4 ft</th><th class="num">6 ft</th><th class="num">8 ft</th><th class="num">10 ft</th></tr></thead>
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Total</th><th class="num">Average</th><th class="num">Percent</th><th class="num">2 ft</th><th class="num">4 ft</th><th class="num">6 ft</th><th class="num">8 ft</th><th class="num">10 ft</th><th class="num">Free throws</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
         </section>
+      </div>
+    </section>
 
+    <section class="section">
+      <div class="card-grid two">
         <section class="leaderboard">
           <h2>⚡ Quickest reaction</h2>
           <p class="leaderboard-sub">Lowest average reaction time from the three-trial test.</p>
           <div class="table-wrap">
             <table id="reactionTable">
               <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Reaction (ms)</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
-
-        <section class="leaderboard">
-          <h2>🎯 Free-throw leaders</h2>
-          <p class="leaderboard-sub">Most free throws made out of five attempts.</p>
-          <div class="table-wrap">
-            <table id="freeThrowTable">
-              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Made</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -165,11 +158,27 @@
             const cell = document.createElement("td");
             if (columnIndex === 0) cell.className = "rank";
             if (column.className) cell.className += " " + column.className;
-            cell.textContent = column.value(item, index);
+            const content = column.value(item, index);
+            if (content instanceof Node) cell.appendChild(content);
+            else cell.textContent = content;
             row.appendChild(cell);
           });
           tbody.appendChild(row);
         });
+      }
+
+      function fraction(numerator, denominator) {
+        const wrap = document.createElement("span");
+        wrap.className = "frac";
+        const top = document.createElement("span");
+        top.className = "frac-num";
+        top.textContent = numerator;
+        const bottom = document.createElement("span");
+        bottom.className = "frac-den";
+        bottom.textContent = denominator;
+        wrap.appendChild(top);
+        wrap.appendChild(bottom);
+        return wrap;
       }
 
       function rankColumn() {
@@ -185,13 +194,18 @@
         renderRows("shootersTable", rows, [
           rankColumn(),
           { value: function (player) { return player.nickname; } },
-          { className: "num", value: function (player) { return Junior.formatNumber(player.shotAverage, 2) + " / 5"; } },
-          { className: "num", value: function (player) { return player.totalShots + " / 25"; } },
+          { className: "num", value: function (player) { return fraction(player.totalShots, 25); } },
+          { className: "num", value: function (player) { return fraction(Junior.formatNumber(player.shotAverage, 2), 5); } },
+          { className: "num", value: function (player) { return Math.round(player.totalShots / 25 * 100) + "%"; } },
           { className: "num", value: function (player) { return player.shots[2] == null ? "—" : player.shots[2]; } },
           { className: "num", value: function (player) { return player.shots[4] == null ? "—" : player.shots[4]; } },
           { className: "num", value: function (player) { return player.shots[6] == null ? "—" : player.shots[6]; } },
           { className: "num", value: function (player) { return player.shots[8] == null ? "—" : player.shots[8]; } },
           { className: "num", value: function (player) { return player.shots[10] == null ? "—" : player.shots[10]; } },
+          { className: "num", value: function (player) {
+            const made = player.measurement ? Junior.finiteNumber(player.measurement.free_throws_made) : null;
+            return made === null ? "—" : fraction(made, 5);
+          } },
         ], "No player has all five distances yet.");
       }
 
@@ -234,7 +248,6 @@
         const players = Junior.mergePlayers(records.measurements, records.shots);
         renderShooters(players);
         renderMeasurements(players, "reactionTable", "reaction_time_ms", true, "No reaction-time results yet.", function (value) { return value == null ? "—" : value + " ms"; });
-        renderMeasurements(players, "freeThrowTable", "free_throws_made", false, "No free-throw results yet.", function (value) { return value == null ? "—" : value + " / 5"; });
         renderMeasurements(players, "passTable", "ten_pass_seconds", true, "No 10-pass times yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 2) + " s"; });
         renderMeasurements(players, "heightTable", "height_cm", false, "No height measurements yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 1) + " cm"; });
         renderFinish(players);
