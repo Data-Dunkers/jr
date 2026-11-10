@@ -1400,6 +1400,7 @@ th.num {
   display: flex;
   flex-direction: column;
   height: 100%;
+  text-decoration: none;
 }
 
 .activity-index-card .activity-top {
