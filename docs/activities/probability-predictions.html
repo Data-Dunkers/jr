@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-probability">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probability and Predictions · Data Dunkers Junior</title>
+  <meta name="description" content="Use class shooting percentages to predict makes and test expected value with a simulation.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 5 · Chance and prediction</div>
+        <h1>Probability and <span>predictions</span></h1>
+        <p class="hero-lead">If a player shoots 5 times, how many should we expect to go in? Use the class data to estimate a probability, then test your prediction with a simulation.</p>
+        <div class="activity-meta">
+          <span class="badge orange">Core</span>
+          <span class="badge">20 minutes</span>
+          <span class="badge purple">Expected value</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-yellow">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Class evidence</div>
+              <h2>Shooting percentage by distance</h2>
+              <p>Use this chart to estimate the probability of making one shot at each distance.</p>
+            </div>
+            <span class="badge" id="dataBadge">Loading…</span>
+          </div>
+          <div id="probabilityChart" class="chart-box"></div>
+          <p class="chart-note" id="chartNote"></p>
+        </div>
+
+        <div class="card card-blue">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Make a prediction</div>
+              <h2>Expected number of makes</h2>
+              <p>Expected makes = probability × number of attempts.</p>
+            </div>
+          </div>
+          <div class="chart-controls">
+            <div class="form-group">
+              <label for="distanceSelect">Distance</label>
+              <select id="distanceSelect"></select>
+            </div>
+            <div class="form-group">
+              <label for="attemptsSelect">Number of shots</label>
+              <select id="attemptsSelect">
+                <option value="1">1 shot</option>
+                <option value="5" selected>5 shots</option>
+                <option value="10">10 shots</option>
+                <option value="20">20 shots</option>
+              </select>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-value" id="probabilityValue">—</span><span class="stat-label">Class probability</span></div>
+            <div class="stat"><span class="stat-value" id="attemptsValue">—</span><span class="stat-label">Attempts</span></div>
+            <div class="stat"><span class="stat-value" id="expectedValue">—</span><span class="stat-label">Expected makes</span></div>
+          </div>
+          <p class="chart-note" id="predictionNote"></p>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="simulateButton">Simulate 1,000 players</button>
+            <button type="button" class="btn btn-ghost" id="resetSimulationButton">Clear simulation</button>
+          </div>
+          <div id="simulationChart" class="chart-box short" style="margin-top: 1rem;"></div>
+          <p class="chart-note" id="simulationNote">Run a simulation to see how much random results can vary.</p>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Questions</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-green">
+          <h2>What to do</h2>
+          <ol class="steps">
+            <li>Choose a distance and read the class probability.</li>
+            <li>Predict the expected makes for 5 shots.</li>
+            <li>Run the simulation and compare.</li>
+            <li>Explain why a simulation does not always match the prediction exactly.</li>
+          </ol>
+        </div>
+        <div class="card card-purple" style="margin-top: 1rem;">
+          <h3>Probability language</h3>
+          <p><strong>Probability:</strong> a number from 0 to 1 (or 0% to 100%).</p>
+          <p><strong>Expected:</strong> the average result over many trials.</p>
+          <p class="mb-0"><strong>Random:</strong> each trial can turn out differently.</p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Careful!</h3>
+          <p class="mb-0">A probability from a small class sample is an estimate, not a guarantee. More data usually makes a better estimate.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+      let rows = [];
+
+      const questions = [
+        "Which distance has the highest probability of a made shot? Which has the lowest?",
+        "For your chosen distance and number of attempts, what is the expected number of makes? Show the multiplication.",
+        "Run the simulation. Did the average match the expected value? Why might it be a little different?",
+        "If you simulated 10,000 players instead of 1,000, would you expect the average to get closer to the expected value or farther away? Explain.",
+        "Why is a probability from a small sample less trustworthy than one from a large sample?",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_probability_answers");
+
+      function probabilityFor(distance) {
+        const row = rows.find(function (item) { return item.distance === Number(distance); });
+        if (!row || !row.count) return null;
+        return row.total / (row.count * Junior.SHOTS_PER_DISTANCE);
+      }
+
+      function setupSelects() {
+        const distanceSelect = document.getElementById("distanceSelect");
+        distanceSelect.innerHTML = "";
+        Junior.DISTANCES.forEach(function (distance) {
+          const option = document.createElement("option");
+          option.value = String(distance);
+          option.textContent = distance + " ft";
+          distanceSelect.appendChild(option);
+        });
+        distanceSelect.addEventListener("change", updatePrediction);
+        document.getElementById("attemptsSelect").addEventListener("change", updatePrediction);
+      }
+
+      function drawChart() {
+        const usable = rows.filter(function (row) { return row.count > 0; });
+        if (!usable.length) {
+          Junior.emptyChart("probabilityChart", "No shot data has been collected yet.");
+          return;
+        }
+        const percentages = usable.map(function (row) {
+          return (row.total / (row.count * Junior.SHOTS_PER_DISTANCE)) * 100;
+        });
+        Junior.plot("probabilityChart", [{
+          type: "bar",
+          x: usable.map(function (row) { return row.distance + " ft"; }),
+          y: percentages,
+          text: percentages.map(function (value) { return Junior.formatNumber(value, 1) + "%"; }),
+          textposition: "outside",
+          marker: { color: Junior.CHART_COLOURS, line: { color: "#fff", width: 2 } },
+          customdata: usable.map(function (row) { return row.count * Junior.SHOTS_PER_DISTANCE; }),
+          hovertemplate: "%{x}<br>%{y:.1f}% made<br>Attempts: %{customdata}<extra></extra>",
+          cliponaxis: false,
+        }], {
+          title: { text: "Class probability of a made shot", x: 0, font: { size: 17 } },
+          xaxis: { title: "Distance" },
+          yaxis: { title: "Probability of a make (%)", range: [0, 110] },
+          showlegend: false,
+        });
+        document.getElementById("chartNote").textContent = "The probability is estimated from " + usable.reduce(function (sum, row) { return sum + row.count * 5; }, 0) + " shot attempts.";
+      }
+
+      function updatePrediction() {
+        const distance = Number(document.getElementById("distanceSelect").value);
+        const attempts = Number(document.getElementById("attemptsSelect").value);
+        const probability = probabilityFor(distance);
+        const expected = probability === null ? null : probability * attempts;
+        document.getElementById("probabilityValue").textContent = probability === null ? "—" : Junior.formatNumber(probability * 100, 1) + "%";
+        document.getElementById("attemptsValue").textContent = attempts;
+        document.getElementById("expectedValue").textContent = expected === null ? "—" : Junior.formatNumber(expected, 2) + " of " + attempts;
+        document.getElementById("predictionNote").textContent = probability === null
+          ? "No class data for this distance yet."
+          : "Expected makes = " + Junior.formatNumber(probability, 3) + " × " + attempts + " = " + Junior.formatNumber(expected, 2) + ". This is an average over many attempts, not a promise.";
+      }
+
+      function simulate() {
+        const distance = Number(document.getElementById("distanceSelect").value);
+        const attempts = Number(document.getElementById("attemptsSelect").value);
+        const probability = probabilityFor(distance);
+        if (probability === null) {
+          Junior.setStatus("loadStatus", "There is no data for that distance yet.", "error");
+          return;
+        }
+        const counts = new Array(attempts + 1).fill(0);
+        const trials = 1000;
+        let total = 0;
+        for (let trial = 0; trial < trials; trial += 1) {
+          let made = 0;
+          for (let shot = 0; shot < attempts; shot += 1) {
+            if (Math.random() < probability) made += 1;
+          }
+          counts[made] += 1;
+          total += made;
+        }
+        const average = total / trials;
+        Junior.plot("simulationChart", [{
+          type: "bar",
+          x: counts.map(function (_, index) { return String(index); }),
+          y: counts,
+          marker: { color: "#7c5cff", line: { color: "#fff", width: 2 } },
+          hovertemplate: "%{x} makes<br>%{y} players<extra></extra>",
+        }], {
+          title: { text: "Results for 1,000 simulated players", x: 0, font: { size: 16 } },
+          xaxis: { title: "Shots made out of " + attempts },
+          yaxis: { title: "Number of players" },
+          showlegend: false,
+          margin: { t: 50, b: 55 },
+        });
+        document.getElementById("simulationNote").textContent = "Simulated average: " + Junior.formatNumber(average, 2) + " makes. Expected value: " + Junior.formatNumber(probability * attempts, 2) + ". Random results vary around the expected value.";
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          rows = Junior.shotAverages(players);
+          drawChart();
+          const firstUsable = rows.find(function (row) { return row.count > 0; });
+          if (firstUsable) document.getElementById("distanceSelect").value = String(firstUsable.distance);
+          updatePrediction();
+          const shotResults = rows.reduce(function (sum, row) { return sum + row.count; }, 0);
+          document.getElementById("dataBadge").textContent = shotResults ? shotResults + " shot results" : "No shot data";
+          Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("probabilityChart", "Data is not available yet.");
+        }
+      }
+
+      document.getElementById("simulateButton").addEventListener("click", simulate);
+      document.getElementById("resetSimulationButton").addEventListener("click", function () {
+        document.getElementById("simulationChart").innerHTML = "";
+        document.getElementById("simulationNote").textContent = "Run a simulation to see how much random results can vary.";
+      });
+      setupSelects();
+      load();
+    })();
+  </script>
+</body>
+</html>

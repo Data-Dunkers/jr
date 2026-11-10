@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-storytelling">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Storytelling · Data Dunkers Junior</title>
+  <meta name="description" content="Build an evidence-based data story from the class basketball dataset.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 7 · Communication</div>
+        <h1>Data <span>storytelling</span></h1>
+        <p class="hero-lead">A data story is a claim supported by evidence. Pick an angle, look at the chart, and write a short story that a classmate could check.</p>
+        <div class="activity-meta">
+          <span class="badge purple">Stretch</span>
+          <span class="badge">25 minutes</span>
+          <span class="badge orange">Claim + evidence + so what?</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-accent">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Choose a story angle</div>
+              <h2 id="storyTitle">Shooting by distance</h2>
+              <p id="storySubtitle">Start with the shot profile, then write a claim that the chart can support.</p>
+            </div>
+            <span class="badge" id="dataBadge">Loading…</span>
+          </div>
+          <div class="form-group" style="max-width: 460px; margin-bottom: 1rem;">
+            <label for="angleSelect">Story angle</label>
+            <select id="angleSelect">
+              <option value="distance">Shooting by distance</option>
+              <option value="reaction">Reaction time</option>
+              <option value="height">Height</option>
+              <option value="freeThrows">Free throws</option>
+              <option value="passing">10-pass time</option>
+            </select>
+          </div>
+          <div id="storyChart" class="chart-box"></div>
+          <p class="chart-note" id="storyNote"></p>
+        </div>
+
+        <div class="card card-blue">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Evidence</div>
+              <h2>Numbers you can cite</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="evidenceHead"></thead>
+              <tbody id="evidenceBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Write your data story</h2>
+              <p>Use the sentence starters below if you get stuck.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-yellow">
+          <h2>Story recipe</h2>
+          <ol class="steps">
+            <li><strong>Claim:</strong> What do you want us to notice?</li>
+            <li><strong>Evidence:</strong> Which number from the chart supports it?</li>
+            <li><strong>So what?</strong> Why should your audience care?</li>
+            <li><strong>Be fair:</strong> What is one limitation?</li>
+          </ol>
+        </div>
+        <div class="card card-green" style="margin-top: 1rem;">
+          <h3>Sentence starters</h3>
+          <p>“The data shows that…”</p>
+          <p>“For example, the average at ___ ft was ___.”</p>
+          <p>“This matters because…”</p>
+          <p class="mb-0">“One limitation is…”</p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Headline test</h3>
+          <p class="mb-0">Would your headline still be fair if someone saw the whole chart? If not, make it smaller and more precise.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+
+      const questions = [
+        "Write a headline for your data story. Keep it short and fair.",
+        "What is your claim? Which number from the chart or table supports it?",
+        "Why should a classmate or coach care about this pattern?",
+        "What is one limitation of your evidence? For example, is the sample small, or is a group missing?",
+        "If you could collect one more measurement to make the story stronger, what would it be?",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_storytelling_answers");
+
+      function setTable(headers, rows) {
+        const head = document.getElementById("evidenceHead");
+        const body = document.getElementById("evidenceBody");
+        head.innerHTML = "<tr>" + headers.map(function (header, index) {
+          return '<th' + (index === 0 ? "" : ' class="num"') + ">" + Junior.escapeHtml(header) + "</th>";
+        }).join("") + "</tr>";
+        body.innerHTML = "";
+        if (!rows.length) {
+          body.innerHTML = '<tr><td colspan="' + headers.length + '" class="table-empty">No data for this story angle yet.</td></tr>';
+          return;
+        }
+        rows.forEach(function (row) {
+          const tr = document.createElement("tr");
+          row.forEach(function (value, index) {
+            const td = document.createElement("td");
+            if (index > 0) td.className = "num";
+            td.textContent = value;
+            tr.appendChild(td);
+          });
+          body.appendChild(tr);
+        });
+      }
+
+      function drawDistanceStory() {
+        document.getElementById("storyTitle").textContent = "Shooting by distance";
+        document.getElementById("storySubtitle").textContent = "Which distance has the strongest class average?";
+        Junior.shotProfileChart("storyChart", players, { title: "Average shots made by distance" });
+        const rows = Junior.shotAverages(players);
+        const usable = rows.filter(function (row) { return row.count > 0; });
+        setTable(["Distance", "Average made", "Players", "Percentage"], usable.map(function (row) {
+          return [
+            row.distance + " ft",
+            Junior.formatNumber(row.average, 2),
+            String(row.count),
+            Junior.formatNumber((row.average / 5) * 100, 1) + "%",
+          ];
+        }));
+        const best = usable.slice().sort(function (a, b) { return b.average - a.average; })[0];
+        document.getElementById("storyNote").textContent = best
+          ? "Story starter: the class average was highest at " + best.distance + " ft (" + Junior.formatNumber(best.average, 2) + " out of 5)."
+          : "No shot data yet.";
+        document.getElementById("dataBadge").textContent = usable.length ? usable.length + " distances" : "No shot data";
+      }
+
+      function drawMetricStory(angle) {
+        const config = {
+          reaction: { title: "Reaction time", subtitle: "Who has the quickest reaction time?", metric: "reaction_time_ms", ascending: true, decimals: 0, unit: " ms", chart: "Reaction time (ms)" },
+          height: { title: "Height", subtitle: "Who is tallest in the class data?", metric: "height_cm", ascending: false, decimals: 1, unit: " cm", chart: "Height (cm)" },
+          freeThrows: { title: "Free throws", subtitle: "Who made the most free throws out of five?", metric: "free_throws_made", ascending: false, decimals: 0, unit: " / 5", chart: "Free throws made" },
+          passing: { title: "10-pass time", subtitle: "Who completed ten passes fastest?", metric: "ten_pass_seconds", ascending: true, decimals: 2, unit: " s", chart: "10-pass time (s)" },
+        }[angle];
+        document.getElementById("storyTitle").textContent = config.title;
+        document.getElementById("storySubtitle").textContent = config.subtitle;
+        const entries = players.filter(function (player) {
+          return player.measurement && Junior.finiteNumber(player.measurement[config.metric]) !== null;
+        }).map(function (player) {
+          return { nickname: player.nickname, value: Junior.finiteNumber(player.measurement[config.metric]) };
+        }).sort(function (a, b) {
+          return config.ascending ? a.value - b.value : b.value - a.value;
+        });
+        if (!entries.length) {
+          Junior.emptyChart("storyChart", "No data for this story angle yet.");
+          setTable(["Player", config.title], []);
+          document.getElementById("storyNote").textContent = "No data for this story angle yet.";
+          document.getElementById("dataBadge").textContent = "No data";
+          return;
+        }
+        const top = entries.slice(0, 10);
+        Junior.plot("storyChart", [{
+          type: "bar",
+          x: top.map(function (entry) { return entry.nickname; }),
+          y: top.map(function (entry) { return entry.value; }),
+          text: top.map(function (entry) { return Junior.formatNumber(entry.value, config.decimals) + config.unit; }),
+          textposition: "outside",
+          marker: { color: Junior.CHART_COLOURS, line: { color: "#fff", width: 2 } },
+          hovertemplate: "%{x}<br>" + config.chart + ": %{y}<extra></extra>",
+          cliponaxis: false,
+        }], {
+          title: { text: config.chart + " by player", x: 0, font: { size: 16 } },
+          xaxis: { title: "Player" },
+          yaxis: { title: config.chart },
+          showlegend: false,
+          margin: { b: 70 },
+        });
+        setTable(["Player", config.title], entries.map(function (entry) {
+          return [entry.nickname, Junior.formatNumber(entry.value, config.decimals) + config.unit];
+        }));
+        document.getElementById("storyNote").textContent = "Story starter: " + top[0].nickname + " has the " + (config.ascending ? "lowest" : "highest") + " " + config.title.toLowerCase() + " at " + Junior.formatNumber(top[0].value, config.decimals) + config.unit + ".";
+        document.getElementById("dataBadge").textContent = entries.length + " players";
+      }
+
+      function render() {
+        const angle = document.getElementById("angleSelect").value;
+        if (angle === "distance") drawDistanceStory();
+        else drawMetricStory(angle);
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          render();
+          Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("storyChart", "Data is not available yet.");
+        }
+      }
+
+      document.getElementById("angleSelect").addEventListener("change", render);
+      load();
+    })();
+  </script>
+</body>
+</html>

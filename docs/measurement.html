@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-page="measurement">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Measurement Form · Data Dunkers Junior</title>
+  <meta name="description" content="Collect height, wingspan, hand span, heart rate, reaction time, and 10-pass data for the class dataset.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero" style="padding-bottom: 0.5rem;">
+      <div class="hero-copy">
+        <div class="eyebrow">Station 1 · About you</div>
+        <h1>Measurement <span>form</span></h1>
+        <p class="hero-lead">Grab a tape measure, find your pulse, and get ready to move. Every field becomes a column in the class data table.</p>
+        <div class="pill-row">
+          <span class="badge">About 10 minutes</span>
+          <span class="badge green">Grade 5–6 friendly</span>
+          <span class="badge orange">Nickname: 2 letters + 2 digits</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true" style="min-height: 170px;">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <div class="card card-accent">
+      <div class="form-section">
+        <div class="section-label">Player</div>
+        <div class="form-row cols-3">
+          <div class="form-group">
+            <label for="nickname">Nickname</label>
+            <input type="text" id="nickname" class="nickname-input" placeholder="PS43" maxlength="4" autocomplete="off" aria-describedby="nicknameHint">
+            <span class="field-hint" id="nicknameHint">Your nickname is two letters and two digits, like PS43.</span>
+          </div>
+          <div class="form-group">
+            <label for="handedness">Handedness</label>
+            <select id="handedness">
+              <option value="" disabled selected>Choose one…</option>
+              <option value="Left">Left</option>
+              <option value="Right">Right</option>
+              <option value="Ambidextrous">Ambidextrous</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="birth_month">Birth month</label>
+            <select id="birth_month">
+              <option value="" disabled selected>Choose a month…</option>
+              <option>January</option><option>February</option><option>March</option>
+              <option>April</option><option>May</option><option>June</option>
+              <option>July</option><option>August</option><option>September</option>
+              <option>October</option><option>November</option><option>December</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row cols-3" style="margin-top: 0.9rem;">
+          <div class="form-group">
+            <label for="hair_colour">Hair colour</label>
+            <select id="hair_colour">
+              <option value="" disabled selected>Choose one…</option>
+              <option>Black</option>
+              <option>Brown</option>
+              <option>Blonde</option>
+              <option>Red</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>How much do you like basketball?</label>
+            <div class="choice-grid" id="interestChoices" role="group" aria-label="Basketball interest from 1 to 5">
+              <button type="button" class="choice-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="choice-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="choice-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="choice-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="choice-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" id="basketball_interest">
+            <span class="field-hint">1 = not really, 5 = I love it.</span>
+          </div>
+          <div class="form-group">
+            <label>Free throws made</label>
+            <div class="choice-grid" id="freeThrowChoices" role="group" aria-label="Free throws made out of five">
+              <button type="button" class="choice-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="choice-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="choice-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="choice-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="choice-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="choice-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" id="free_throws_made">
+            <span class="field-hint">Out of 5 free-throw attempts.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label">Body measurements</div>
+        <div class="form-row cols-3">
+          <div class="form-group">
+            <label for="height_cm">Height (cm)</label>
+            <input type="number" id="height_cm" min="80" max="230" step="1" placeholder="e.g. 149">
+          </div>
+          <div class="form-group">
+            <label for="wingspan_cm">Wingspan (cm)</label>
+            <input type="number" id="wingspan_cm" min="80" max="260" step="1" placeholder="e.g. 150">
+            <span class="field-hint">Fingertip to fingertip, arms outstretched.</span>
+          </div>
+          <div class="form-group">
+            <label for="hand_span_cm">Hand span (cm)</label>
+            <input type="number" id="hand_span_cm" min="8" max="35" step="1" placeholder="e.g. 18">
+            <span class="field-hint">Thumb tip to little-finger tip.</span>
+          </div>
+        </div>
+        <div class="form-row cols-3" style="margin-top: 0.9rem;">
+          <div class="form-group">
+            <label for="shoe_size">Shoe size</label>
+            <input type="number" id="shoe_size" min="1" max="20" step="0.5" placeholder="e.g. 5.5">
+          </div>
+          <div class="form-group">
+            <label for="resting_heart_rate">Resting heart rate (bpm)</label>
+            <input type="number" id="resting_heart_rate" min="30" max="220" step="1" placeholder="Use the timer below">
+          </div>
+          <div class="form-group">
+            <label for="ten_pass_seconds">10-pass time (seconds)</label>
+            <input type="number" id="ten_pass_seconds" min="1" max="300" step="0.01" placeholder="Use the stopwatch below">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label">Resting heart rate</div>
+        <div class="mode-switch-row">
+          <span id="hrModeEnterLabel" class="mode-switch-label active">Enter a value</span>
+          <label class="mode-switch">
+            <input type="checkbox" id="hrModeSwitch" role="switch" aria-label="Use the timer instead of entering a value">
+            <span class="mode-switch-track"></span>
+          </label>
+          <span id="hrModeTimerLabel" class="mode-switch-label">Use the timer</span>
+        </div>
+        <p class="helper-text" id="hrEnterHelp">Type your resting heart rate in the field above.</p>
+        <div class="timer-card" id="heartTimerCard" hidden>
+          <p class="helper-text">Sit still, find your pulse, then start the 15-second timer. Count each beat silently. When the timer ends, type your count and press “Set BPM”.</p>
+          <div class="timer-status" id="heartStatus">Timer is ready.</div>
+          <div class="heart-runner" id="heartRunner" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label for="beats_15s">Beats counted in 15 seconds</label>
+              <input type="number" id="beats_15s" min="0" max="100" step="1" placeholder="e.g. 17">
+            </div>
+            <div class="form-group" style="justify-content: end;">
+              <button type="button" class="btn btn-blue" id="setBpmButton">Set BPM (×4)</button>
+            </div>
+            <div class="form-group" style="justify-content: end;">
+              <button type="button" class="btn btn-ghost" id="resetHeartButton">Reset timer</button>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="heartStartButton">Start 15-second timer</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label">10-pass stopwatch</div>
+        <div class="timer-card">
+          <p class="helper-text">With a partner, make 10 chest passes as quickly as you can. Start the stopwatch on the first pass and stop it after the tenth pass.</p>
+          <div class="timer-display" id="passDisplay">0.00 s</div>
+          <div class="timer-status" id="passStatus">Stopwatch is ready.</div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-green" id="passStartButton">Start stopwatch</button>
+            <button type="button" class="btn btn-primary" id="passStopButton" disabled>Stop and use time</button>
+            <button type="button" class="btn btn-ghost" id="passResetButton">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label">Reaction time · 3 trials</div>
+        <div class="timer-card">
+          <p class="helper-text">Press “Start trial”, wait for the pad to turn green, then click the pad as fast as you can. Do not click while it is yellow.</p>
+          <div class="timer-status" id="reactionStatus">Ready for trial 1 of 3.</div>
+          <button type="button" class="reaction-pad" id="reactionPad">Start a trial first</button>
+          <div class="trial-pills">
+            <div class="trial-pill" id="trial1">Trial 1: <strong>—</strong></div>
+            <div class="trial-pill" id="trial2">Trial 2: <strong>—</strong></div>
+            <div class="trial-pill" id="trial3">Trial 3: <strong>—</strong></div>
+          </div>
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label for="reaction_time_ms">Average reaction time (ms)</label>
+              <input type="number" id="reaction_time_ms" readonly placeholder="Complete 3 trials">
+            </div>
+            <div class="form-group" style="justify-content: end;">
+              <button type="button" class="btn btn-primary" id="reactionStartButton">Start trial 1</button>
+            </div>
+            <div class="form-group" style="justify-content: end;">
+              <button type="button" class="btn btn-ghost" id="resetReactionButton">Reset trials</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 1.25rem;">
+        <button type="button" class="submit-btn" id="submitBtn">Save my measurements</button>
+      </div>
+      <p class="field-hint" style="text-align: center; margin-top: 0.6rem;">All fields are required. If anything is missing or looks unusual, we will point it out before saving.</p>
+      <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "measurement" });
+
+      const nicknameInput = document.getElementById("nickname");
+      Junior.setupNicknameField(nicknameInput);
+
+      let interestValue = null;
+      let freeThrowValue = null;
+      let reactionTrials = [];
+      let reactionState = "idle";
+      let reactionStartMs = 0;
+      let reactionTimeout = null;
+      let heartRunning = false;
+      let heartTimeout = null;
+      let passRunning = false;
+      let passStartMs = 0;
+      let passInterval = null;
+
+      function selectChoice(container, hiddenInput, value) {
+        container.querySelectorAll(".choice-btn").forEach(function (button) {
+          const isSelected = button.dataset.value === String(value);
+          button.classList.toggle("active", isSelected);
+          button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+        });
+        hiddenInput.value = value;
+      }
+
+      document.getElementById("interestChoices").addEventListener("click", function (event) {
+        const button = event.target.closest(".choice-btn");
+        if (!button) return;
+        interestValue = button.dataset.value;
+        selectChoice(this, document.getElementById("basketball_interest"), interestValue);
+        clearFieldError(this, "interestChoices");
+      });
+
+      document.getElementById("freeThrowChoices").addEventListener("click", function (event) {
+        const button = event.target.closest(".choice-btn");
+        if (!button) return;
+        freeThrowValue = button.dataset.value;
+        selectChoice(this, document.getElementById("free_throws_made"), freeThrowValue);
+        clearFieldError(this, "freeThrowChoices");
+      });
+
+      function syncReactionUI() {
+        const status = document.getElementById("reactionStatus");
+        const pad = document.getElementById("reactionPad");
+        const startButton = document.getElementById("reactionStartButton");
+
+        if (reactionTrials.length >= 3) {
+          reactionState = "done";
+          status.textContent = "All 3 trials complete. Your average is ready.";
+          pad.textContent = "Trials complete";
+          pad.className = "reaction-pad";
+          startButton.disabled = true;
+          startButton.textContent = "Done";
+          return;
+        }
+
+        const nextTrial = reactionTrials.length + 1;
+        startButton.disabled = reactionState === "waiting" || reactionState === "ready";
+        startButton.textContent = "Start trial " + nextTrial;
+
+        if (reactionState === "waiting") {
+          status.textContent = "Trial " + nextTrial + ": wait for green…";
+          pad.textContent = "Wait for it to turn green…";
+          pad.className = "reaction-pad waiting";
+        } else if (reactionState === "ready") {
+          status.textContent = "Trial " + nextTrial + ": click now!";
+          pad.textContent = "CLICK!";
+          pad.className = "reaction-pad ready";
+        } else {
+          status.textContent = "Ready for trial " + nextTrial + " of 3.";
+          pad.textContent = "Start a trial first";
+          pad.className = "reaction-pad";
+        }
+      }
+
+      function updateTrialDisplay() {
+        for (let index = 0; index < 3; index += 1) {
+          const element = document.getElementById("trial" + (index + 1));
+          const value = reactionTrials[index];
+          element.innerHTML = "Trial " + (index + 1) + ": <strong>" + (value == null ? "—" : value + " ms") + "</strong>";
+        }
+      }
+
+      function setReactionAverage() {
+        const input = document.getElementById("reaction_time_ms");
+        if (reactionTrials.length < 3) {
+          input.value = "";
+          return;
+        }
+        const total = reactionTrials.reduce(function (sum, value) { return sum + value; }, 0);
+        input.value = Math.round(total / reactionTrials.length);
+      }
+
+      function startReactionTrial() {
+        if (reactionState === "waiting" || reactionState === "ready" || reactionTrials.length >= 3) return;
+        reactionState = "waiting";
+        syncReactionUI();
+        const delay = 1200 + Math.floor(Math.random() * 2200);
+        reactionTimeout = setTimeout(function () {
+          reactionState = "ready";
+          reactionStartMs = performance.now();
+          syncReactionUI();
+        }, delay);
+      }
+
+      function onReactionPadClick() {
+        if (reactionState === "waiting") {
+          clearTimeout(reactionTimeout);
+          reactionTimeout = null;
+          reactionState = "idle";
+          syncReactionUI();
+          Junior.setStatus("statusMessage", "Too early! That trial was reset. Wait for green next time.", "error");
+          return;
+        }
+        if (reactionState !== "ready") return;
+        const elapsed = Math.round(performance.now() - reactionStartMs);
+        reactionTrials.push(elapsed);
+        reactionState = "idle";
+        reactionTimeout = null;
+        updateTrialDisplay();
+        setReactionAverage();
+        syncReactionUI();
+        clearFieldError(document.getElementById("reaction_time_ms"));
+      }
+
+      function resetReaction() {
+        if (reactionTimeout) {
+          clearTimeout(reactionTimeout);
+          reactionTimeout = null;
+        }
+        reactionTrials = [];
+        reactionState = "idle";
+        updateTrialDisplay();
+        setReactionAverage();
+        syncReactionUI();
+        clearFieldError(document.getElementById("reaction_time_ms"));
+      }
+
+      document.getElementById("reactionPad").addEventListener("click", onReactionPadClick);
+      document.getElementById("reactionStartButton").addEventListener("click", startReactionTrial);
+      document.getElementById("resetReactionButton").addEventListener("click", resetReaction);
+
+      function syncHeartUI() {
+        const status = document.getElementById("heartStatus");
+        const runner = document.getElementById("heartRunner");
+        const startButton = document.getElementById("heartStartButton");
+        if (heartRunning) {
+          status.textContent = "Timer running… keep counting your pulse.";
+          runner.classList.add("running");
+          startButton.disabled = true;
+        } else {
+          runner.classList.remove("running");
+          startButton.disabled = false;
+        }
+      }
+
+      document.getElementById("hrModeSwitch").addEventListener("change", function () {
+        const useTimer = this.checked;
+        document.getElementById("heartTimerCard").hidden = !useTimer;
+        document.getElementById("hrEnterHelp").hidden = useTimer;
+        document.getElementById("hrModeEnterLabel").classList.toggle("active", !useTimer);
+        document.getElementById("hrModeTimerLabel").classList.toggle("active", useTimer);
+        document.getElementById("resting_heart_rate").placeholder = useTimer ? "Use the timer below" : "e.g. 72";
+        if (!useTimer) document.getElementById("resetHeartButton").click();
+      });
+
+      document.getElementById("heartStartButton").addEventListener("click", function () {
+        if (heartRunning) return;
+        heartRunning = true;
+        document.getElementById("heartStatus").textContent = "Timer running… keep counting your pulse.";
+        syncHeartUI();
+        heartTimeout = setTimeout(function () {
+          heartRunning = false;
+          document.getElementById("heartStatus").textContent = "Timer complete. Type your beat count and press Set BPM.";
+          syncHeartUI();
+        }, 15000);
+      });
+
+      document.getElementById("resetHeartButton").addEventListener("click", function () {
+        if (heartTimeout) {
+          clearTimeout(heartTimeout);
+          heartTimeout = null;
+        }
+        heartRunning = false;
+        document.getElementById("beats_15s").value = "";
+        document.getElementById("heartStatus").textContent = "Timer is ready.";
+        syncHeartUI();
+      });
+
+      document.getElementById("setBpmButton").addEventListener("click", function () {
+        const beats = parseInt(document.getElementById("beats_15s").value, 10);
+        if (!Number.isFinite(beats) || beats <= 0) {
+          Junior.setStatus("statusMessage", "Type the number of beats you counted first.", "error");
+          return;
+        }
+        const bpm = beats * 4;
+        document.getElementById("resting_heart_rate").value = bpm;
+        clearFieldError(document.getElementById("resting_heart_rate"));
+        Junior.setStatus("statusMessage", "Heart rate set to " + bpm + " bpm.", "success");
+      });
+
+      function formatPass(seconds) {
+        return seconds.toFixed(2) + " s";
+      }
+
+      function updatePassDisplay() {
+        if (!passRunning) return;
+        const seconds = (performance.now() - passStartMs) / 1000;
+        document.getElementById("passDisplay").textContent = formatPass(seconds);
+      }
+
+      document.getElementById("passStartButton").addEventListener("click", function () {
+        if (passRunning) return;
+        passRunning = true;
+        passStartMs = performance.now();
+        document.getElementById("passStartButton").disabled = true;
+        document.getElementById("passStopButton").disabled = false;
+        document.getElementById("passStatus").textContent = "Stopwatch running. Stop it after the tenth pass.";
+        document.getElementById("passDisplay").textContent = "0.00 s";
+        passInterval = setInterval(updatePassDisplay, 50);
+      });
+
+      document.getElementById("passStopButton").addEventListener("click", function () {
+        if (!passRunning) return;
+        passRunning = false;
+        clearInterval(passInterval);
+        const seconds = (performance.now() - passStartMs) / 1000;
+        document.getElementById("passDisplay").textContent = formatPass(seconds);
+        document.getElementById("ten_pass_seconds").value = seconds.toFixed(2);
+        clearFieldError(document.getElementById("ten_pass_seconds"));
+        document.getElementById("passStartButton").disabled = false;
+        document.getElementById("passStopButton").disabled = true;
+        document.getElementById("passStatus").textContent = "Saved " + formatPass(seconds) + " to the form.";
+      });
+
+      document.getElementById("passResetButton").addEventListener("click", function () {
+        passRunning = false;
+        clearInterval(passInterval);
+        document.getElementById("passDisplay").textContent = "0.00 s";
+        document.getElementById("passStatus").textContent = "Stopwatch is ready.";
+        document.getElementById("passStartButton").disabled = false;
+        document.getElementById("passStopButton").disabled = true;
+      });
+
+      document.getElementById("height_cm").addEventListener("blur", function () {
+        const wingspan = document.getElementById("wingspan_cm");
+        if (this.value && !wingspan.value) wingspan.placeholder = this.value;
+      });
+
+      function resetForm() {
+        document.getElementById("handedness").value = "";
+        document.getElementById("birth_month").value = "";
+        document.getElementById("hair_colour").value = "";
+        document.getElementById("height_cm").value = "";
+        document.getElementById("wingspan_cm").value = "";
+        document.getElementById("hand_span_cm").value = "";
+        document.getElementById("shoe_size").value = "";
+        document.getElementById("resting_heart_rate").value = "";
+        document.getElementById("beats_15s").value = "";
+        document.getElementById("ten_pass_seconds").value = "";
+        interestValue = null;
+        freeThrowValue = null;
+        document.getElementById("basketball_interest").value = "";
+        document.getElementById("free_throws_made").value = "";
+        document.querySelectorAll("#interestChoices .choice-btn, #freeThrowChoices .choice-btn").forEach(function (button) {
+          button.classList.remove("active");
+          button.setAttribute("aria-pressed", "false");
+        });
+        resetReaction();
+        if (heartTimeout) clearTimeout(heartTimeout);
+        heartTimeout = null;
+        heartRunning = false;
+        document.getElementById("heartStatus").textContent = "Timer is ready.";
+        const hrSwitch = document.getElementById("hrModeSwitch");
+        if (hrSwitch.checked) {
+          hrSwitch.checked = false;
+          hrSwitch.dispatchEvent(new Event("change"));
+        }
+        syncHeartUI();
+        passRunning = false;
+        clearInterval(passInterval);
+        document.getElementById("passDisplay").textContent = "0.00 s";
+        document.getElementById("passStatus").textContent = "Stopwatch is ready.";
+        document.getElementById("passStartButton").disabled = false;
+        document.getElementById("passStopButton").disabled = true;
+        clearAllFieldErrors();
+      }
+
+      const errorLabels = {
+        nickname: "nickname",
+        handedness: "handedness",
+        birth_month: "birth month",
+        hair_colour: "hair colour",
+        interestChoices: "basketball interest",
+        freeThrowChoices: "free throws",
+        height_cm: "height",
+        wingspan_cm: "wingspan",
+        hand_span_cm: "hand span",
+        shoe_size: "shoe size",
+        resting_heart_rate: "heart rate",
+        ten_pass_seconds: "10-pass time",
+        reaction_time_ms: "reaction time",
+      };
+
+      function clearFieldError(element, key) {
+        if (!element) return;
+        const errorId = (key || element.id) + "-error";
+        const node = document.getElementById(errorId);
+        if (node) node.remove();
+        element.classList.remove("field-invalid");
+        element.removeAttribute("aria-invalid");
+        if (element.dataset.originalDescribedBy !== undefined) {
+          if (element.dataset.originalDescribedBy) element.setAttribute("aria-describedby", element.dataset.originalDescribedBy);
+          else element.removeAttribute("aria-describedby");
+          delete element.dataset.originalDescribedBy;
+        }
+      }
+
+      function clearAllFieldErrors() {
+        document.querySelectorAll(".field-invalid").forEach(function (element) {
+          clearFieldError(element, element.id);
+        });
+      }
+
+      function setFieldError(key, element, message) {
+        if (!element) return;
+        const errorId = key + "-error";
+        if (element.dataset.originalDescribedBy === undefined) {
+          element.dataset.originalDescribedBy = element.getAttribute("aria-describedby") || "";
+        }
+        element.classList.add("field-invalid");
+        element.setAttribute("aria-invalid", "true");
+        let node = document.getElementById(errorId);
+        if (!node) {
+          node = document.createElement("span");
+          node.id = errorId;
+          node.className = "field-error";
+          const group = element.closest(".form-group") || element.parentElement;
+          group.appendChild(node);
+        }
+        node.textContent = message;
+        const describedBy = (element.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+        if (describedBy.indexOf(errorId) === -1) {
+          describedBy.push(errorId);
+          element.setAttribute("aria-describedby", describedBy.join(" "));
+        }
+      }
+
+      const formCard = document.querySelector(".card-accent");
+      formCard.addEventListener("input", function (event) {
+        if (event.target.matches("input, select, textarea")) clearFieldError(event.target);
+      });
+      formCard.addEventListener("change", function (event) {
+        if (event.target.matches("input, select, textarea")) clearFieldError(event.target);
+      });
+
+      function readNumber(id) {
+        const element = document.getElementById(id);
+        const raw = String(element.value).trim();
+        return { element: element, raw: raw, value: raw === "" ? NaN : Number(raw) };
+      }
+
+      function collectMeasurementErrors() {
+        const errors = [];
+        function add(key, element, message) {
+          if (errors.some(function (item) { return item.key === key; })) return;
+          errors.push({ key: key, element: element, message: message });
+        }
+
+        const nickname = Junior.normalizeNickname(nicknameInput.value);
+        if (!Junior.isValidNickname(nickname)) {
+          add("nickname", nicknameInput, Junior.nicknameMessage(nickname));
+        }
+
+        const handedness = document.getElementById("handedness");
+        if (!handedness.value) add("handedness", handedness, "Choose your handedness.");
+
+        const birthMonth = document.getElementById("birth_month");
+        if (!birthMonth.value) add("birth_month", birthMonth, "Choose your birth month.");
+
+        const hairColour = document.getElementById("hair_colour");
+        if (!hairColour.value) add("hair_colour", hairColour, "Choose your hair colour.");
+
+        if (document.getElementById("basketball_interest").value === "") {
+          add("interestChoices", document.getElementById("interestChoices"), "Choose how much you like basketball, from 1 to 5.");
+        }
+
+        if (document.getElementById("free_throws_made").value === "") {
+          add("freeThrowChoices", document.getElementById("freeThrowChoices"), "Choose how many free throws you made, from 0 to 5.");
+        }
+
+        const height = readNumber("height_cm");
+        if (!height.raw) {
+          add("height_cm", height.element, "Enter your height in centimetres.");
+        } else if (!Number.isFinite(height.value) || height.value < 80 || height.value > 230) {
+          add("height_cm", height.element, "Height should be between 80 and 230 cm. Check the tape measure.");
+        }
+
+        const wingspan = readNumber("wingspan_cm");
+        if (!wingspan.raw) {
+          add("wingspan_cm", wingspan.element, "Enter your wingspan in centimetres.");
+        } else if (!Number.isFinite(wingspan.value) || wingspan.value < 80 || wingspan.value > 260) {
+          add("wingspan_cm", wingspan.element, "Wingspan should be between 80 and 260 cm. Measure fingertip to fingertip.");
+        }
+
+        const handSpan = readNumber("hand_span_cm");
+        if (!handSpan.raw) {
+          add("hand_span_cm", handSpan.element, "Enter your hand span in centimetres.");
+        } else if (!Number.isFinite(handSpan.value) || handSpan.value < 8 || handSpan.value > 35) {
+          add("hand_span_cm", handSpan.element, "Hand span should be between 8 and 35 cm. Measure thumb tip to little-finger tip.");
+        }
+
+        const shoeSize = readNumber("shoe_size");
+        if (!shoeSize.raw) {
+          add("shoe_size", shoeSize.element, "Enter your shoe size.");
+        } else if (!Number.isFinite(shoeSize.value) || shoeSize.value < 1 || shoeSize.value > 20) {
+          add("shoe_size", shoeSize.element, "Shoe size should be between 1 and 20.");
+        }
+
+        const heartRate = readNumber("resting_heart_rate");
+        if (!heartRate.raw) {
+          add("resting_heart_rate", heartRate.element, "Enter your resting heart rate, or use the 15-second timer.");
+        } else if (!Number.isFinite(heartRate.value) || heartRate.value < 30 || heartRate.value > 220) {
+          add("resting_heart_rate", heartRate.element, "Resting heart rate should be between 30 and 220 bpm. Count the beats again if you are unsure.");
+        }
+
+        const tenPass = readNumber("ten_pass_seconds");
+        if (!tenPass.raw) {
+          add("ten_pass_seconds", tenPass.element, "Use the stopwatch to time 10 passes, or type a time in seconds.");
+        } else if (!Number.isFinite(tenPass.value) || tenPass.value < 1 || tenPass.value > 300) {
+          add("ten_pass_seconds", tenPass.element, "10-pass time should be between 1 and 300 seconds. Use the stopwatch to measure it.");
+        }
+
+        const reactionInput = document.getElementById("reaction_time_ms");
+        const reactionTime = Number(reactionInput.value);
+        if (reactionTrials.length < 3 || !Number.isFinite(reactionTime)) {
+          add("reaction_time_ms", reactionInput, "Complete all three reaction-time trials so we can calculate your average.");
+        } else if (reactionTime < 80 || reactionTime > 2000) {
+          add("reaction_time_ms", reactionInput, "Your average reaction time of " + Math.round(reactionTime) + " ms looks unusual. Reset the trials and try again.");
+        }
+
+        if (heartRunning) {
+          add("resting_heart_rate", document.getElementById("resting_heart_rate"), "Stop the heart-rate timer before saving.");
+        }
+        if (passRunning) {
+          add("ten_pass_seconds", document.getElementById("ten_pass_seconds"), "Stop the 10-pass stopwatch before saving.");
+        }
+
+        return errors;
+      }
+
+      function summariseLabels(labels) {
+        if (labels.length === 1) return labels[0];
+        if (labels.length <= 3) return labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
+        return labels.slice(0, 3).join(", ") + " and " + (labels.length - 3) + " more";
+      }
+
+      document.getElementById("submitBtn").addEventListener("click", async function () {
+        const button = this;
+
+        clearAllFieldErrors();
+        const errors = collectMeasurementErrors();
+        if (errors.length) {
+          errors.forEach(function (error) {
+            setFieldError(error.key, error.element, error.message);
+          });
+          const labels = errors.map(function (error) { return errorLabels[error.key] || "a field"; });
+          Junior.setStatus(
+            "statusMessage",
+            "Almost there! Check your " + summariseLabels(labels) + " before saving. The note under each field explains what to do.",
+            "error"
+          );
+          const first = errors[0].element;
+          const focusTarget = first.matches("input, select, textarea, button") ? first : first.querySelector("button, input, select");
+          if (focusTarget) focusTarget.focus({ preventScroll: true });
+          first.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
+        const nickname = Junior.normalizeNickname(nicknameInput.value);
+        const handedness = document.getElementById("handedness").value;
+        const birthMonth = document.getElementById("birth_month").value;
+        const hairColour = document.getElementById("hair_colour").value;
+        const height = parseFloat(document.getElementById("height_cm").value);
+        const wingspan = parseFloat(document.getElementById("wingspan_cm").value);
+        const handSpan = parseFloat(document.getElementById("hand_span_cm").value);
+        const shoeSize = parseFloat(document.getElementById("shoe_size").value);
+        const heartRate = parseInt(document.getElementById("resting_heart_rate").value, 10);
+        const reactionTime = parseInt(document.getElementById("reaction_time_ms").value, 10);
+        const freeThrows = parseInt(document.getElementById("free_throws_made").value, 10);
+        const tenPass = parseFloat(document.getElementById("ten_pass_seconds").value);
+
+        button.disabled = true;
+        button.textContent = "Saving…";
+        try {
+          Junior.saveNickname(nickname);
+          await Junior.postRecord(Junior.COLLECTIONS.measurements, {
+            nickname: nickname,
+            basketball_interest: Number(interestValue),
+            resting_heart_rate: heartRate,
+            height_cm: height,
+            wingspan_cm: wingspan,
+            hand_span_cm: handSpan,
+            shoe_size: shoeSize,
+            reaction_time_ms: reactionTime,
+            free_throws_made: freeThrows,
+            ten_pass_seconds: tenPass,
+            handedness: handedness,
+            birth_month: birthMonth,
+            hair_colour: hairColour,
+          });
+          Junior.setStatus("statusMessage", "Measurements saved for " + nickname + ". Nice work!", "success");
+          resetForm();
+          nicknameInput.value = nickname;
+        } catch (error) {
+          Junior.setStatus("statusMessage", error.message, "error");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Save my measurements";
+        }
+      });
+
+      syncReactionUI();
+      syncHeartUI();
+    })();
+  </script>
+</body>
+</html>

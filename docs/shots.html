@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" data-page="shots">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shot Form · Data Dunkers Junior</title>
+  <meta name="description" content="Record basketball shots made from 2, 4, 6, 8, and 10 feet and track your five-distance progress.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero" style="padding-bottom: 0.5rem;">
+      <div class="hero-copy">
+        <div class="eyebrow">Station 2 · On the court</div>
+        <h1>Shot <span>form</span></h1>
+        <p class="hero-lead">Take five shots from each distance. Record how many went in. Your results become one row per distance in the class dataset.</p>
+        <div class="pill-row">
+          <span class="badge">5 distances</span>
+          <span class="badge green">5 shots each</span>
+          <span class="badge orange">25 shots total</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true" style="min-height: 170px;">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <div class="card card-accent">
+      <div class="form-section">
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label for="nickname">Nickname</label>
+            <input type="text" id="nickname" class="nickname-input" placeholder="RC78" maxlength="4" autocomplete="off" aria-describedby="nicknameHint">
+            <span class="field-hint" id="nicknameHint">Use the same nickname you used on the measurement form.</span>
+          </div>
+          <div class="form-group" style="justify-content: end;">
+            <button type="button" class="btn btn-ghost" id="loadHistoryButton">Load my shot history</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label">How many shots did you make?</div>
+        <p class="helper-text">Choose one number for each distance. If you have already logged a distance with this nickname, it will be marked as complete.</p>
+        <div class="distance-rows">
+          <div class="distance-row" data-distance="2">
+            <span class="distance-label">2 ft</span>
+            <div class="option-group" role="group" aria-label="Shots made at 2 feet">
+              <button type="button" class="option-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="option-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="option-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="option-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="option-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="option-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" class="shots-made-value">
+            <span class="field-hint row-note"></span>
+          </div>
+          <div class="distance-row" data-distance="4">
+            <span class="distance-label">4 ft</span>
+            <div class="option-group" role="group" aria-label="Shots made at 4 feet">
+              <button type="button" class="option-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="option-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="option-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="option-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="option-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="option-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" class="shots-made-value">
+            <span class="field-hint row-note"></span>
+          </div>
+          <div class="distance-row" data-distance="6">
+            <span class="distance-label">6 ft</span>
+            <div class="option-group" role="group" aria-label="Shots made at 6 feet">
+              <button type="button" class="option-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="option-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="option-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="option-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="option-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="option-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" class="shots-made-value">
+            <span class="field-hint row-note"></span>
+          </div>
+          <div class="distance-row" data-distance="8">
+            <span class="distance-label">8 ft</span>
+            <div class="option-group" role="group" aria-label="Shots made at 8 feet">
+              <button type="button" class="option-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="option-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="option-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="option-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="option-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="option-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" class="shots-made-value">
+            <span class="field-hint row-note"></span>
+          </div>
+          <div class="distance-row" data-distance="10">
+            <span class="distance-label">10 ft</span>
+            <div class="option-group" role="group" aria-label="Shots made at 10 feet">
+              <button type="button" class="option-btn" data-value="0" aria-pressed="false">0</button>
+              <button type="button" class="option-btn" data-value="1" aria-pressed="false">1</button>
+              <button type="button" class="option-btn" data-value="2" aria-pressed="false">2</button>
+              <button type="button" class="option-btn" data-value="3" aria-pressed="false">3</button>
+              <button type="button" class="option-btn" data-value="4" aria-pressed="false">4</button>
+              <button type="button" class="option-btn" data-value="5" aria-pressed="false">5</button>
+            </div>
+            <input type="hidden" class="shots-made-value">
+            <span class="field-hint row-note"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="submit-btn" id="submitBtn">Save my shots</button>
+      </div>
+      <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+    </div>
+
+    <section class="section">
+      <div class="card card-blue">
+        <div class="card-title-row">
+          <div>
+            <div class="eyebrow">Your progress</div>
+            <h2 id="historyTitle">Shot history</h2>
+            <p id="historySubtitle">Enter your nickname and load your history to see what is already saved.</p>
+          </div>
+          <span class="badge" id="historyBadge">No history loaded</span>
+        </div>
+        <div class="progress" id="shotProgress" role="progressbar" aria-label="Shot completion progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><span id="progressBar"></span></div>
+        <p class="table-note" id="progressText">0 of 5 distances complete.</p>
+        <div class="table-wrap" id="historyTableWrap" hidden>
+          <table>
+            <thead>
+              <tr><th>Distance</th><th>Shots made</th><th>Saved</th></tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="historyEmpty">
+          <strong>No shots loaded yet</strong>
+          Type a valid nickname, then press “Load my shot history”.
+        </div>
+      </div>
+    </section>
+
+    <div class="card card-yellow">
+      <div class="card-title-row">
+        <div>
+          <div class="eyebrow">Fair test</div>
+          <h2>Don't change the setup</h2>
+        </div>
+      </div>
+      <p class="mb-0">Use the same ball, hoop height, and distance markers for everyone.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "shots" });
+
+      const nicknameInput = document.getElementById("nickname");
+      Junior.setupNicknameField(nicknameInput);
+
+      const distanceRows = Junior.$$(".distance-row");
+      const historyBody = document.getElementById("historyBody");
+      const historyTableWrap = document.getElementById("historyTableWrap");
+      const historyEmpty = document.getElementById("historyEmpty");
+      const historyBadge = document.getElementById("historyBadge");
+      const progressBar = document.getElementById("progressBar");
+      const progressTrack = document.getElementById("shotProgress");
+      const progressText = document.getElementById("progressText");
+      let loadedRecords = [];
+      let loading = false;
+
+      function clearRows() {
+        distanceRows.forEach(function (row) {
+          row.dataset.recorded = "false";
+          row.querySelector(".shots-made-value").value = "";
+          row.querySelector(".row-note").textContent = "";
+          row.querySelectorAll(".option-btn").forEach(function (button) {
+            button.disabled = false;
+            button.classList.remove("active");
+            button.setAttribute("aria-pressed", "false");
+          });
+        });
+      }
+
+      function selectShots(button) {
+        const row = button.closest(".distance-row");
+        if (row.dataset.recorded === "true") return;
+        row.querySelector(".shots-made-value").value = button.dataset.value;
+        row.querySelectorAll(".option-btn").forEach(function (other) {
+          other.classList.remove("active");
+          other.setAttribute("aria-pressed", "false");
+        });
+        button.classList.add("active");
+        button.setAttribute("aria-pressed", "true");
+      }
+
+      distanceRows.forEach(function (row) {
+        row.addEventListener("click", function (event) {
+          const button = event.target.closest(".option-btn");
+          if (button) selectShots(button);
+        });
+      });
+
+      function updateProgress(records) {
+        const latest = new Map();
+        records.forEach(function (record) {
+          const distance = Number(record.distance);
+          if (!latest.has(distance) || Junior.recordTime(record) > Junior.recordTime(latest.get(distance))) {
+            latest.set(distance, record);
+          }
+        });
+        const count = latest.size;
+        const made = Array.from(latest.values()).reduce(function (sum, record) {
+          return sum + (Number(record.shots_made) || 0);
+        }, 0);
+        progressBar.style.width = (count / 5 * 100) + "%";
+        progressTrack.setAttribute("aria-valuenow", String(count));
+        progressText.textContent = count + " of 5 distances complete · " + made + " shots made out of " + (count * 5) + " attempts.";
+        historyBadge.textContent = count === 5 ? "All 5 distances complete" : count + " / 5 distances";
+        historyBadge.className = "badge " + (count === 5 ? "green" : count ? "orange" : "");
+        return latest;
+      }
+
+      function renderHistory(records) {
+        loadedRecords = records;
+        clearRows();
+        const latest = updateProgress(records);
+        historyBody.innerHTML = "";
+
+        if (!records.length) {
+          historyTableWrap.hidden = true;
+          historyEmpty.hidden = false;
+          return;
+        }
+
+        historyTableWrap.hidden = false;
+        historyEmpty.hidden = true;
+
+        Junior.DISTANCES.forEach(function (distance) {
+          const record = latest.get(distance);
+          const row = document.createElement("tr");
+          const distanceCell = document.createElement("td");
+          distanceCell.textContent = distance + " ft";
+          const madeCell = document.createElement("td");
+          madeCell.textContent = record ? record.shots_made + " / 5" : "—";
+          const dateCell = document.createElement("td");
+          dateCell.textContent = record ? Junior.formatDate(record) : "Not saved";
+          row.appendChild(distanceCell);
+          row.appendChild(madeCell);
+          row.appendChild(dateCell);
+          historyBody.appendChild(row);
+        });
+
+        distanceRows.forEach(function (row) {
+          const distance = Number(row.dataset.distance);
+          const record = latest.get(distance);
+          if (!record) return;
+          row.dataset.recorded = "true";
+          row.querySelector(".row-note").textContent = "Already saved: " + record.shots_made + " / 5.";
+          const made = Number(record.shots_made);
+          row.querySelectorAll(".option-btn").forEach(function (button) {
+            const isSaved = Number(button.dataset.value) === made;
+            button.disabled = true;
+            button.classList.toggle("active", isSaved);
+            button.setAttribute("aria-pressed", isSaved ? "true" : "false");
+          });
+          row.querySelector(".shots-made-value").value = "";
+        });
+      }
+
+      async function loadHistory() {
+        const nickname = Junior.normalizeNickname(nicknameInput.value);
+        if (!Junior.isValidNickname(nickname)) {
+          Junior.setStatus("statusMessage", Junior.nicknameMessage(nickname), "error");
+          return;
+        }
+        if (loading) return;
+        loading = true;
+        const button = document.getElementById("loadHistoryButton");
+        button.disabled = true;
+        button.textContent = "Loading…";
+        try {
+          Junior.saveNickname(nickname);
+          const records = await Junior.fetchAll(Junior.COLLECTIONS.shots);
+          const mine = records.filter(function (record) {
+            return Junior.normalizeNickname(record.nickname) === nickname;
+          });
+          renderHistory(mine);
+          document.getElementById("historyTitle").textContent = "Shot history for " + nickname;
+          document.getElementById("historySubtitle").textContent = "Latest saved result for each distance.";
+          if (!mine.length) {
+            Junior.setStatus("statusMessage", "No shots found for " + nickname + " yet. Choose your results and save them below.", "info");
+          } else {
+            Junior.setStatus("statusMessage", "Loaded " + mine.length + " shot record" + (mine.length === 1 ? "" : "s") + " for " + nickname + ".", "success");
+          }
+        } catch (error) {
+          Junior.setStatus("statusMessage", error.message, "error");
+        } finally {
+          loading = false;
+          button.disabled = false;
+          button.textContent = "Load my shot history";
+        }
+      }
+
+      document.getElementById("loadHistoryButton").addEventListener("click", loadHistory);
+      nicknameInput.addEventListener("blur", function () {
+        if (Junior.isValidNickname(nicknameInput.value)) loadHistory();
+      });
+
+      document.getElementById("submitBtn").addEventListener("click", async function () {
+        const button = this;
+        const nickname = Junior.normalizeNickname(nicknameInput.value);
+        if (!Junior.isValidNickname(nickname)) {
+          Junior.setStatus("statusMessage", Junior.nicknameMessage(nickname), "error");
+          nicknameInput.focus();
+          return;
+        }
+
+        const selectedRows = distanceRows.filter(function (row) {
+          return row.dataset.recorded !== "true" && row.querySelector(".shots-made-value").value !== "";
+        });
+        if (!selectedRows.length) {
+          Junior.setStatus("statusMessage", "Choose at least one distance result before saving.", "error");
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Saving…";
+        let saved = 0;
+        const failures = [];
+        try {
+          Junior.saveNickname(nickname);
+          for (const row of selectedRows) {
+            try {
+              await Junior.postRecord(Junior.COLLECTIONS.shots, {
+                nickname: nickname,
+                distance: Number(row.dataset.distance),
+                shots_made: Number(row.querySelector(".shots-made-value").value),
+              });
+              saved += 1;
+            } catch (error) {
+              failures.push(row.dataset.distance + " ft: " + error.message);
+            }
+          }
+          await loadHistory();
+          if (failures.length) {
+            Junior.setStatus("statusMessage", "Saved " + saved + " distance" + (saved === 1 ? "" : "s") + ". Could not save: " + failures.join("; "), "error");
+          } else {
+            Junior.setStatus("statusMessage", "Saved " + saved + " distance" + (saved === 1 ? "" : "s") + " for " + nickname + ". Keep going!", "success");
+          }
+        } catch (error) {
+          Junior.setStatus("statusMessage", error.message, "error");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Save my shots";
+        }
+      });
+
+      clearRows();
+      updateProgress([]);
+      if (Junior.isValidNickname(nicknameInput.value)) loadHistory();
+    })();
+  </script>
+</body>
+</html>

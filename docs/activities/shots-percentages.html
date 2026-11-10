@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-shots-percentages">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shots and Percentages · Data Dunkers Junior</title>
+  <meta name="description" content="Turn made shots into percentages, compare distances, and check how sample size changes the story.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 4 · Fractions and percent</div>
+        <h1>Shots and <span>percentages</span></h1>
+        <p class="hero-lead">“3 out of 5” is a fraction. A percentage makes it easier to compare different numbers of attempts. Let’s turn the class shots into percentages.</p>
+        <div class="activity-meta">
+          <span class="badge orange">Core</span>
+          <span class="badge">20 minutes</span>
+          <span class="badge green">Fractions → percent</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-green">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Class shooting</div>
+              <h2>Percentage made by distance</h2>
+              <p>Percentage = shots made ÷ shots attempted × 100.</p>
+            </div>
+            <span class="badge" id="shotBadge">Loading…</span>
+          </div>
+          <div id="percentageChart" class="chart-box"></div>
+          <p class="chart-note" id="chartNote"></p>
+        </div>
+
+        <div class="card card-blue">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Show the work</div>
+              <h2>Made, attempted, percentage</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Distance</th><th class="num">Made</th><th class="num">Attempted</th><th class="num">Percentage</th><th class="num">Players</th></tr></thead>
+              <tbody id="percentageBody"></tbody>
+            </table>
+          </div>
+          <p class="table-note">Every player attempts 5 shots at each distance they complete.</p>
+        </div>
+
+        <div class="card card-yellow">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Another comparison</div>
+              <h2>Free throws</h2>
+              <p>Free throws are a different kind of shot. Compare the class free-throw percentage with the shot percentages above.</p>
+            </div>
+            <span class="badge orange" id="freeThrowBadge">—</span>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-value" id="freeThrowMade">—</span><span class="stat-label">Free throws made</span></div>
+            <div class="stat"><span class="stat-value" id="freeThrowAttempts">—</span><span class="stat-label">Attempts (5 each)</span></div>
+            <div class="stat"><span class="stat-value" id="freeThrowPct">—</span><span class="stat-label">Class percentage</span></div>
+          </div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Questions</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-yellow">
+          <h2>What to do</h2>
+          <ol class="steps">
+            <li>Find the highest and lowest percentages.</li>
+            <li>Check how many attempts are behind each percentage.</li>
+            <li>Compare the free-throw percentage with the shot percentages.</li>
+            <li>Decide which distance needs the most practice.</li>
+          </ol>
+        </div>
+        <div class="card card-purple" style="margin-top: 1rem;">
+          <h3>Percentage reminder</h3>
+          <p class="mb-0">3 out of 5 = 3 ÷ 5 = 0.6 = 60%. A percentage is a fraction out of 100.</p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Careful!</h3>
+          <p class="mb-0">A player with 1 out of 1 is 100%, but one attempt is not much evidence. Ask how many attempts were taken.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+
+      const questions = [
+        "Which distance has the highest shooting percentage? Which has the lowest? Give the percentages.",
+        "How many attempts are behind each percentage? Why does the number of attempts matter?",
+        "A player makes 3 out of 5 shots at 10 ft and 1 out of 5 at 2 ft. What can you say about this player? What can you not say?",
+        "What is the class free-throw percentage? How does it compare with the shot percentages?",
+        "Which distance would you recommend practising most? Use evidence from the table.",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_shots_percentages_answers");
+
+      function renderTable(rows) {
+        const body = document.getElementById("percentageBody");
+        body.innerHTML = "";
+        const hasData = rows.some(function (row) { return row.count > 0; });
+        if (!hasData) {
+          body.innerHTML = '<tr><td colspan="5" class="table-empty">No shot data yet. Use the shot form, then refresh this page.</td></tr>';
+          return;
+        }
+        rows.forEach(function (row) {
+          const attempts = row.count * Junior.SHOTS_PER_DISTANCE;
+          const percentage = attempts ? (row.total / attempts) * 100 : null;
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + row.distance + " ft</td>" +
+            '<td class="num">' + row.total + "</td>" +
+            '<td class="num">' + attempts + "</td>" +
+            '<td class="num">' + (percentage === null ? "—" : Junior.formatNumber(percentage, 1) + "%") + "</td>" +
+            '<td class="num">' + row.count + "</td>";
+          body.appendChild(tr);
+        });
+      }
+
+      function drawChart(rows) {
+        const usable = rows.filter(function (row) { return row.count > 0; });
+        if (!usable.length) {
+          Junior.emptyChart("percentageChart", "No shot data has been collected yet.");
+          return;
+        }
+        const percentages = usable.map(function (row) { return (row.total / (row.count * Junior.SHOTS_PER_DISTANCE)) * 100; });
+        Junior.plot("percentageChart", [{
+          type: "bar",
+          x: usable.map(function (row) { return row.distance + " ft"; }),
+          y: percentages,
+          text: percentages.map(function (value) { return Junior.formatNumber(value, 1) + "%"; }),
+          textposition: "outside",
+          marker: { color: Junior.CHART_COLOURS, line: { color: "#fff", width: 2 } },
+          customdata: usable.map(function (row) { return row.count * Junior.SHOTS_PER_DISTANCE; }),
+          hovertemplate: "%{x}<br>%{y:.1f}% made<br>Attempts: %{customdata}<extra></extra>",
+          cliponaxis: false,
+        }], {
+          title: { text: "Class shooting percentage by distance", x: 0, font: { size: 17 } },
+          xaxis: { title: "Distance" },
+          yaxis: { title: "Shots made (%)", range: [0, 110] },
+          showlegend: false,
+        });
+      }
+
+      function renderFreeThrows() {
+        const values = players.map(function (player) {
+          return player.measurement ? Junior.finiteNumber(player.measurement.free_throws_made) : null;
+        }).filter(function (value) { return value !== null; });
+        const made = values.reduce(function (sum, value) { return sum + value; }, 0);
+        const attempts = values.length * 5;
+        const percentage = attempts ? (made / attempts) * 100 : null;
+        document.getElementById("freeThrowMade").textContent = values.length ? made : "—";
+        document.getElementById("freeThrowAttempts").textContent = values.length ? attempts : "—";
+        document.getElementById("freeThrowPct").textContent = percentage === null ? "—" : Junior.formatNumber(percentage, 1) + "%";
+        document.getElementById("freeThrowBadge").textContent = values.length ? values.length + " players" : "No data";
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          const rows = Junior.shotAverages(players);
+          drawChart(rows);
+          renderTable(rows);
+          renderFreeThrows();
+          const shotResults = rows.reduce(function (sum, row) { return sum + row.count; }, 0);
+          document.getElementById("shotBadge").textContent = shotResults ? shotResults + " shot results" : "No shot data";
+          const usable = rows.filter(function (row) { return row.count > 0; });
+          if (usable.length) {
+            const best = usable.slice().sort(function (a, b) { return (b.total / b.count) - (a.total / a.count); })[0];
+            document.getElementById("chartNote").textContent = "Best percentage: " + best.distance + " ft at " + Junior.formatNumber((best.total / (best.count * 5)) * 100, 1) + "% across " + best.count + " player result" + (best.count === 1 ? "" : "s") + ".";
+            Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+          } else {
+            document.getElementById("chartNote").textContent = "No shot data yet.";
+            Junior.setStatus("loadStatus", "No shot data yet. Use the shot form, then come back.", "error");
+          }
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("percentageChart", "Data is not available yet.");
+        }
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

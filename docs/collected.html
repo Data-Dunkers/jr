@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-page="collected">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collected Data · Data Dunkers Junior</title>
+  <meta name="description" content="Browse the live class dataset, filter by student or completion, sort the table, and export a CSV.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero" style="padding-bottom: 0.5rem;">
+      <div class="hero-copy">
+        <div class="eyebrow">The class dataset</div>
+        <h1>Collected <span>data</span></h1>
+        <p class="hero-lead">Every student, every measurement, and every shot distance in one place. Filter the table, check who is finished, and download a CSV for further investigation.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true" style="min-height: 170px;">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <div class="card card-accent">
+      <div class="card-title-row">
+        <div>
+          <div class="eyebrow">Live table</div>
+          <h2>Players and records</h2>
+          <p id="lastUpdated">Not loaded yet.</p>
+        </div>
+        <div class="btn-row" style="margin-top: 0;">
+          <button type="button" class="btn btn-blue" id="refreshButton">Refresh</button>
+          <button type="button" class="btn btn-green" id="downloadButton">Download CSV</button>
+        </div>
+      </div>
+
+      <div class="chart-controls" style="align-items: end;">
+        <div class="form-group">
+          <label for="searchInput">Find a nickname</label>
+          <input type="search" id="searchInput" placeholder="RC78">
+        </div>
+        <div class="form-group">
+          <label for="dateSelect">Last activity date</label>
+          <select id="dateSelect">
+            <option value="All dates">All dates</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="completionSelect">Completion</label>
+          <select id="completionSelect">
+            <option value="All players">All players</option>
+            <option value="Complete">Complete (measurement + all 5 distances)</option>
+            <option value="Incomplete">Incomplete</option>
+            <option value="Measurements only">Measurements only</option>
+            <option value="Shots only">Shots only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 0.45rem; min-height: 46px;">
+            <input type="checkbox" id="autoRefreshToggle" style="width: auto; min-height: auto;">
+            Auto-refresh every 30 seconds
+          </label>
+        </div>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom: 1rem;">
+        <div class="stat"><span class="stat-value" id="countPlayers">—</span><span class="stat-label">Players shown</span></div>
+        <div class="stat"><span class="stat-value" id="countMeasurements">—</span><span class="stat-label">Measurement records</span></div>
+        <div class="stat"><span class="stat-value" id="countComplete">—</span><span class="stat-label">Complete players</span></div>
+        <div class="stat"><span class="stat-value" id="averageShotPct">—</span><span class="stat-label">Average shot %</span></div>
+      </div>
+
+      <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+      <div class="table-wrap" id="tableWrap" hidden>
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th data-sort="nickname">Nickname</th>
+              <th data-sort="lastActivity">Last activity</th>
+              <th data-sort="basketball_interest" class="num">Interest</th>
+              <th data-sort="height_cm" class="num">Height (cm)</th>
+              <th data-sort="wingspan_cm" class="num">Wingspan (cm)</th>
+              <th data-sort="hand_span_cm" class="num">Hand span (cm)</th>
+              <th data-sort="shoe_size" class="num">Shoe</th>
+              <th data-sort="resting_heart_rate" class="num">Heart rate</th>
+              <th data-sort="reaction_time_ms" class="num">Reaction (ms)</th>
+              <th data-sort="free_throws_made" class="num">Free throws</th>
+              <th data-sort="ten_pass_seconds" class="num">10-pass (s)</th>
+              <th data-sort="handedness">Handedness</th>
+              <th data-sort="birth_month">Birth month</th>
+              <th data-sort="hair_colour">Hair</th>
+              <th data-sort="shot2" class="num">2 ft</th>
+              <th data-sort="shot4" class="num">4 ft</th>
+              <th data-sort="shot6" class="num">6 ft</th>
+              <th data-sort="shot8" class="num">8 ft</th>
+              <th data-sort="shot10" class="num">10 ft</th>
+              <th data-sort="shot_total" class="num">Total</th>
+              <th data-sort="shot_percentage" class="num">Shot %</th>
+              <th data-sort="complete">Complete</th>
+            </tr>
+          </thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState">
+        <strong>No data loaded yet</strong>
+        Press Refresh to load the class records.
+      </div>
+      <p class="table-note">The table shows the latest measurement and the latest result for each shot distance for every nickname.</p>
+    </div>
+
+    <div class="card card-blue">
+      <div class="card-title-row">
+        <div>
+          <div class="eyebrow">Data talk</div>
+          <h2>What should we do with this table?</h2>
+        </div>
+      </div>
+      <div class="card-grid two">
+        <div>
+          <h3>Look for complete rows</h3>
+          <p>A complete player has a measurement record and all five shot distances. Complete rows are the easiest to compare.</p>
+        </div>
+        <div>
+          <h3>Ask before you compare</h3>
+          <p>Are the groups the same size? Did everyone use the same distances?</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "collected" });
+
+      let allPlayers = [];
+      let allMeasurements = [];
+      let allShots = [];
+      let filteredPlayers = [];
+      let sortKey = "nickname";
+      let sortDirection = 1;
+      let refreshTimer = null;
+      let loading = false;
+
+      const searchInput = document.getElementById("searchInput");
+      const dateSelect = document.getElementById("dateSelect");
+      const completionSelect = document.getElementById("completionSelect");
+      const autoRefreshToggle = document.getElementById("autoRefreshToggle");
+      const tableWrap = document.getElementById("tableWrap");
+      const emptyState = document.getElementById("emptyState");
+      const dataBody = document.getElementById("dataBody");
+      const loadStatus = document.getElementById("loadStatus");
+
+      function sortValue(player, key) {
+        if (key === "lastActivity") return player.lastActivity || 0;
+        if (key === "nickname") return player.nickname;
+        if (key === "complete") return player.hasMeasurement && player.completedShots ? 1 : 0;
+        if (key === "shot_total") return player.totalShots;
+        if (key === "shot_percentage") return player.shotPercentage === null ? -1 : player.shotPercentage;
+        if (/^shot(2|4|6|8|10)$/.test(key)) {
+          const value = player.shots[Number(key.replace("shot", ""))];
+          return value === null || value === undefined ? -1 : value;
+        }
+        return player.measurement ? (player.measurement[key] == null ? "" : player.measurement[key]) : "";
+      }
+
+      function comparePlayers(a, b) {
+        const aValue = sortValue(a, sortKey);
+        const bValue = sortValue(b, sortKey);
+        if (typeof aValue === "number" && typeof bValue === "number") return (aValue - bValue) * sortDirection;
+        return String(aValue).localeCompare(String(bValue), undefined, { sensitivity: "base" }) * sortDirection;
+      }
+
+      function populateDates() {
+        const previous = dateSelect.value;
+        const dates = new Set();
+        allPlayers.forEach(function (player) {
+          if (player.lastActivity) dates.add(Junior.localDateKey(new Date(player.lastActivity)));
+        });
+        dateSelect.innerHTML = '<option value="All dates">All dates</option>';
+        Array.from(dates).sort().reverse().forEach(function (date) {
+          const option = document.createElement("option");
+          option.value = date;
+          option.textContent = date;
+          dateSelect.appendChild(option);
+        });
+        if (Array.from(dateSelect.options).some(function (option) { return option.value === previous; })) {
+          dateSelect.value = previous;
+        }
+      }
+
+      function filterPlayers() {
+        const query = Junior.normalizeNickname(searchInput.value);
+        const date = dateSelect.value;
+        const completion = completionSelect.value;
+
+        filteredPlayers = allPlayers.filter(function (player) {
+          if (query && player.nickname.indexOf(query) === -1) return false;
+          if (date !== "All dates" && Junior.localDateKey(new Date(player.lastActivity)) !== date) return false;
+          const complete = player.hasMeasurement && player.completedShots;
+          if (completion === "Complete" && !complete) return false;
+          if (completion === "Incomplete" && complete) return false;
+          if (completion === "Measurements only" && !(player.hasMeasurement && !player.recordedDistances.length)) return false;
+          if (completion === "Shots only" && !(!player.hasMeasurement && player.recordedDistances.length)) return false;
+          return true;
+        }).sort(comparePlayers);
+      }
+
+      function addCell(row, text, className) {
+        const cell = document.createElement("td");
+        cell.textContent = text;
+        if (className) cell.className = className;
+        row.appendChild(cell);
+        return cell;
+      }
+
+      function renderTable() {
+        filterPlayers();
+        dataBody.innerHTML = "";
+        const complete = filteredPlayers.filter(function (player) { return player.hasMeasurement && player.completedShots; }).length;
+        const shotPcts = filteredPlayers.map(function (player) { return player.shotPercentage; }).filter(function (value) { return value !== null; });
+        document.getElementById("countPlayers").textContent = filteredPlayers.length;
+        document.getElementById("countMeasurements").textContent = filteredPlayers.filter(function (player) { return player.hasMeasurement; }).length;
+        document.getElementById("countComplete").textContent = complete;
+        document.getElementById("averageShotPct").textContent = shotPcts.length ? Junior.formatNumber(Junior.mean(shotPcts), 1) + "%" : "—";
+
+        if (!filteredPlayers.length) {
+          tableWrap.hidden = true;
+          emptyState.hidden = false;
+          emptyState.innerHTML = allPlayers.length === 0
+            ? "<strong>No records yet</strong>Collect a measurement or some shots with this event key, then refresh."
+            : "<strong>No players match these filters</strong>Try clearing the search, date, or completion filter.";
+          return;
+        }
+
+        tableWrap.hidden = false;
+        emptyState.hidden = true;
+
+        filteredPlayers.forEach(function (player) {
+          const row = document.createElement("tr");
+          addCell(row, player.nickname, "nowrap");
+          addCell(row, player.lastActivity ? Junior.formatDate({ created: new Date(player.lastActivity).toISOString() }) : "—", "nowrap");
+          const m = player.measurement || {};
+          addCell(row, m.basketball_interest == null ? "—" : m.basketball_interest, "num");
+          addCell(row, m.height_cm == null ? "—" : Junior.formatNumber(m.height_cm, 1), "num");
+          addCell(row, m.wingspan_cm == null ? "—" : Junior.formatNumber(m.wingspan_cm, 1), "num");
+          addCell(row, m.hand_span_cm == null ? "—" : Junior.formatNumber(m.hand_span_cm, 1), "num");
+          addCell(row, m.shoe_size == null ? "—" : Junior.formatNumber(m.shoe_size, 1), "num");
+          addCell(row, m.resting_heart_rate == null ? "—" : m.resting_heart_rate, "num");
+          addCell(row, m.reaction_time_ms == null ? "—" : m.reaction_time_ms, "num");
+          addCell(row, m.free_throws_made == null ? "—" : m.free_throws_made, "num");
+          addCell(row, m.ten_pass_seconds == null ? "—" : Junior.formatNumber(m.ten_pass_seconds, 2), "num");
+          addCell(row, m.handedness || "—");
+          addCell(row, m.birth_month || "—");
+          addCell(row, m.hair_colour || "—");
+          Junior.DISTANCES.forEach(function (distance) {
+            const value = player.shots[distance];
+            addCell(row, value === null || value === undefined ? "—" : value, "num");
+          });
+          addCell(row, player.recordedDistances.length ? player.totalShots : "—", "num");
+          addCell(row, player.shotPercentage === null ? "—" : Junior.formatNumber(player.shotPercentage, 1) + "%", "num");
+          const completeCell = document.createElement("td");
+          completeCell.innerHTML = player.hasMeasurement && player.completedShots ? '<span class="check">✔</span>' : '<span class="cross">✘</span>';
+          row.appendChild(completeCell);
+          dataBody.appendChild(row);
+        });
+      }
+
+      function updateSortIndicators() {
+        Junior.$$("#dataTable th").forEach(function (header) {
+          const base = header.textContent.replace(/[ ▲▼]+$/, "");
+          if (header.dataset.sort === sortKey) header.textContent = base + (sortDirection === 1 ? " ▲" : " ▼");
+          else header.textContent = base;
+        });
+      }
+
+      function updateLastUpdated() {
+        document.getElementById("lastUpdated").textContent = "Last updated " + new Date().toLocaleTimeString() + ".";
+      }
+
+      async function refresh(showLoading) {
+        if (loading) return;
+        loading = true;
+        const button = document.getElementById("refreshButton");
+        button.disabled = true;
+        button.textContent = "Loading…";
+        if (showLoading) Junior.setStatus(loadStatus, "Loading records from api.datadunkers.ca…", "info");
+        try {
+          const data = await Junior.loadData();
+          allMeasurements = data.measurements;
+          allShots = data.shots;
+          allPlayers = Junior.mergePlayers(allMeasurements, allShots);
+          populateDates();
+          renderTable();
+          updateSortIndicators();
+          updateLastUpdated();
+          Junior.setStatus(loadStatus, "Loaded " + allMeasurements.length + " measurement record" + (allMeasurements.length === 1 ? "" : "s") + " and " + allShots.length + " shot record" + (allShots.length === 1 ? "" : "s") + ".", "success");
+        } catch (error) {
+          Junior.setStatus(loadStatus, "Could not load the class data. " + error.message, "error");
+          if (!allPlayers.length) {
+            tableWrap.hidden = true;
+            emptyState.hidden = false;
+            emptyState.innerHTML = "<strong>Data is not available yet</strong>" + Junior.escapeHtml(error.message);
+          }
+        } finally {
+          loading = false;
+          button.disabled = false;
+          button.textContent = "Refresh";
+        }
+      }
+
+      function setupAutoRefresh() {
+        const stored = localStorage.getItem("junior_collected_autorefresh") === "1";
+        autoRefreshToggle.checked = stored;
+        const apply = function () {
+          clearInterval(refreshTimer);
+          refreshTimer = autoRefreshToggle.checked ? setInterval(function () { refresh(false); }, 30000) : null;
+          localStorage.setItem("junior_collected_autorefresh", autoRefreshToggle.checked ? "1" : "0");
+        };
+        autoRefreshToggle.addEventListener("change", apply);
+        apply();
+      }
+
+      document.getElementById("refreshButton").addEventListener("click", function () { refresh(true); });
+      searchInput.addEventListener("input", renderTable);
+      dateSelect.addEventListener("change", renderTable);
+      completionSelect.addEventListener("change", renderTable);
+      document.getElementById("downloadButton").addEventListener("click", function () {
+        if (!filteredPlayers.length) {
+          Junior.setStatus(loadStatus, "There is nothing to download with the current filters.", "error");
+          return;
+        }
+        const key = (Junior.eventKey() || "class").replace(/[^a-z0-9_-]+/gi, "-");
+        Junior.downloadCsv("data-dunkers-junior-" + key + "-" + Junior.todayKey() + ".csv", Junior.playersToCsv(filteredPlayers));
+        Junior.setStatus(loadStatus, "CSV downloaded for " + filteredPlayers.length + " player" + (filteredPlayers.length === 1 ? "" : "s") + ".", "success");
+      });
+
+      Junior.$$("#dataTable th").forEach(function (header) {
+        if (!header.dataset.sort) return;
+        header.style.cursor = "pointer";
+        header.title = "Click to sort";
+        header.addEventListener("click", function () {
+          if (sortKey === header.dataset.sort) sortDirection *= -1;
+          else {
+            sortKey = header.dataset.sort;
+            sortDirection = 1;
+          }
+          renderTable();
+          updateSortIndicators();
+        });
+      });
+
+      setupAutoRefresh();
+      refresh(true);
+    })();
+  </script>
+</body>
+</html>

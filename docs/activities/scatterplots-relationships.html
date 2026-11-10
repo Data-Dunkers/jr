@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-scatterplots">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scatterplots and Relationships · Data Dunkers Junior</title>
+  <meta name="description" content="Plot two class measurements, look for a relationship, and remember that correlation is not causation.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 3 · Relationships</div>
+        <h1>Scatterplots and <span>relationships</span></h1>
+        <p class="hero-lead">A scatterplot puts two measurements on the same picture. Look for a pattern, an outlier, and a reason to be careful about cause and effect.</p>
+        <div class="activity-meta">
+          <span class="badge orange">Core</span>
+          <span class="badge">20 minutes</span>
+          <span class="badge purple">Correlation ≠ causation</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-purple">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Build a scatterplot</div>
+              <h2>Two measurements, one dot per player</h2>
+              <p>Change the axes and look for a pattern. The dashed line is the trend line; <strong>r</strong> summarises how closely the dots follow a straight line.</p>
+            </div>
+            <span class="badge" id="rBadge">r = —</span>
+          </div>
+          <div class="chart-controls">
+            <div class="form-group">
+              <label for="xSelect">Horizontal axis</label>
+              <select id="xSelect"></select>
+            </div>
+            <div class="form-group">
+              <label for="ySelect">Vertical axis</label>
+              <select id="ySelect"></select>
+            </div>
+            <div class="form-group">
+              <label for="colourSelect">Colour by</label>
+              <select id="colourSelect"></select>
+            </div>
+          </div>
+          <div id="scatterChart" class="chart-box" style="min-height: 420px;"></div>
+          <p class="chart-note" id="scatterNote"></p>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Questions</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-yellow">
+          <h2>What to do</h2>
+          <ol class="steps">
+            <li>Choose two measurements that might be related.</li>
+            <li>Describe the pattern: up, down, or no clear direction.</li>
+            <li>Find a dot that does not fit the pattern.</li>
+            <li>Write one possible explanation — and one reason it might be wrong.</li>
+          </ol>
+        </div>
+        <div class="card card-blue" style="margin-top: 1rem;">
+          <h3>Reading r</h3>
+          <p><strong>r near 1:</strong> strong positive pattern.</p>
+          <p><strong>r near −1:</strong> strong negative pattern.</p>
+          <p class="mb-0"><strong>r near 0:</strong> weak or no straight-line pattern.</p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Careful!</h3>
+          <p class="mb-0">Two measurements can move together without one causing the other. Look for a third factor that could explain both.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+      const metrics = Junior.NUMERIC_METRICS.filter(function (metric) {
+        return ["shot_percentage", "shot_average"].indexOf(metric.key) === -1;
+      });
+
+      const questions = [
+        "Which two measurements did you plot? Describe the pattern in one sentence.",
+        "What is the value of r? Is the relationship strong, moderate, or weak?",
+        "Find one player whose dot is far from the trend line. What might explain it?",
+        "Does the pattern prove that one measurement causes the other? Explain why or why not.",
+        "If you could collect one more piece of data to test the relationship, what would you collect and why?",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_scatterplots_answers");
+
+      function fillSelect(select, options, selected) {
+        select.innerHTML = "";
+        options.forEach(function (option) {
+          const item = document.createElement("option");
+          item.value = option.key;
+          item.textContent = option.label;
+          if (option.key === selected) item.selected = true;
+          select.appendChild(item);
+        });
+      }
+
+      function setupControls() {
+        fillSelect(document.getElementById("xSelect"), metrics, "height_cm");
+        fillSelect(document.getElementById("ySelect"), metrics, "wingspan_cm");
+        fillSelect(document.getElementById("colourSelect"), [{ key: "", label: "One colour" }].concat(Junior.CATEGORICAL_METRICS), "");
+        ["xSelect", "ySelect", "colourSelect"].forEach(function (id) {
+          document.getElementById(id).addEventListener("change", draw);
+        });
+      }
+
+      function draw() {
+        const xKey = document.getElementById("xSelect").value;
+        const yKey = document.getElementById("ySelect").value;
+        const colourKey = document.getElementById("colourSelect").value;
+        const xMetric = Junior.metricDefinition(xKey);
+        const yMetric = Junior.metricDefinition(yKey);
+        const valid = players.filter(function (player) {
+          const x = Junior.metricValue(player, xKey);
+          const y = Junior.metricValue(player, yKey);
+          return x !== null && y !== null && Number.isFinite(x) && Number.isFinite(y);
+        });
+
+        if (valid.length < 2) {
+          Junior.emptyChart("scatterChart", "Two or more players with both measurements are needed.");
+          document.getElementById("rBadge").textContent = "r = —";
+          document.getElementById("scatterNote").textContent = "Collect more complete measurements to build a scatterplot.";
+          return;
+        }
+
+        const traces = [];
+        if (colourKey) {
+          Junior.groupBy(valid, colourKey).forEach(function (entry, index) {
+            traces.push({
+              type: "scatter",
+              mode: "markers",
+              name: entry[0],
+              x: entry[1].map(function (player) { return Junior.metricValue(player, xKey); }),
+              y: entry[1].map(function (player) { return Junior.metricValue(player, yKey); }),
+              text: entry[1].map(function (player) { return player.nickname; }),
+              marker: { size: 12, color: Junior.CHART_COLOURS[index % Junior.CHART_COLOURS.length], line: { color: "#fff", width: 2 } },
+              hovertemplate: "%{text}<br>" + (xMetric ? xMetric.label : xKey) + ": %{x}<br>" + (yMetric ? yMetric.label : yKey) + ": %{y}<extra></extra>",
+            });
+          });
+        } else {
+          traces.push({
+            type: "scatter",
+            mode: "markers",
+            name: "Players",
+            x: valid.map(function (player) { return Junior.metricValue(player, xKey); }),
+            y: valid.map(function (player) { return Junior.metricValue(player, yKey); }),
+            text: valid.map(function (player) { return player.nickname; }),
+            marker: { size: 13, color: "#7c5cff", line: { color: "#fff", width: 2 } },
+            hovertemplate: "%{text}<br>" + (xMetric ? xMetric.label : xKey) + ": %{x}<br>" + (yMetric ? yMetric.label : yKey) + ": %{y}<extra></extra>",
+          });
+        }
+
+        const xValues = valid.map(function (player) { return Junior.metricValue(player, xKey); });
+        const yValues = valid.map(function (player) { return Junior.metricValue(player, yKey); });
+        const regression = Junior.linearRegression(xValues, yValues);
+        const r = Junior.pearson(xValues, yValues);
+        if (regression) {
+          traces.push({
+            type: "scatter",
+            mode: "lines",
+            name: "Trend line",
+            x: [regression.minX, regression.maxX],
+            y: [regression.slope * regression.minX + regression.intercept, regression.slope * regression.maxX + regression.intercept],
+            line: { color: "#1e2a44", dash: "dash", width: 2 },
+            hoverinfo: "skip",
+            showlegend: false,
+          });
+        }
+
+        Junior.plot("scatterChart", traces, {
+          title: { text: (yMetric ? yMetric.label : yKey) + " vs " + (xMetric ? xMetric.label : xKey), x: 0, font: { size: 17 } },
+          xaxis: { title: xMetric ? xMetric.label + (xMetric.unit ? " (" + xMetric.unit + ")" : "") : xKey },
+          yaxis: { title: yMetric ? yMetric.label + (yMetric.unit ? " (" + yMetric.unit + ")" : "") : yKey },
+          annotations: r === null ? [] : [{
+            text: "r = " + r.toFixed(2),
+            xref: "paper", yref: "paper", x: 0.02, y: 0.98,
+            showarrow: false,
+            bgcolor: "rgba(255,255,255,0.92)",
+            bordercolor: "#e3e9f3", borderwidth: 1,
+            font: { size: 13, color: "#1e2a44", family: "Nunito" },
+          }],
+          showlegend: Boolean(colourKey),
+        });
+
+        document.getElementById("rBadge").textContent = r === null ? "r = —" : "r = " + r.toFixed(2);
+        let strength = "little or no straight-line";
+        if (r !== null) {
+          const absolute = Math.abs(r);
+          if (absolute >= 0.7) strength = "strong";
+          else if (absolute >= 0.4) strength = "moderate";
+          else if (absolute >= 0.2) strength = "weak";
+          else strength = "little or no straight-line";
+        }
+        document.getElementById("scatterNote").textContent = r === null
+          ? valid.length + " players have both measurements."
+          : "There is a " + strength + " relationship (r = " + r.toFixed(2) + ") across " + valid.length + " players. The trend line is a summary, not a rule.";
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          draw();
+          Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("scatterChart", "Data is not available yet.");
+        }
+      }
+
+      setupControls();
+      load();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" data-page="home">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Dunkers Junior</title>
+  <meta name="description" content="A data adventure for Grade 5 and 6 basketball fans.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Basketball + Data</div>
+        <h1>Data Dunkers <span>Junior</span></h1>
+        <p class="hero-lead">
+          Measure, Shoot, Collect, Investigate.
+        </p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <section class="card card-accent" id="keyEntryCard" hidden>
+      <div class="form-group" style="max-width: 460px;">
+        <label for="eventKeyInput">Event key</label>
+        <input type="text" id="eventKeyInput" placeholder="e.g. lincoln2026" autocomplete="off" autocapitalize="none">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" type="button" id="saveKeyButton">Enter</button>
+      </div>
+      <div class="status-message" id="keyStatus" role="status" aria-live="polite"></div>
+    </section>
+
+    <div id="mainCard" hidden>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Your class right now</div>
+            <p>These numbers update from the records saved with your event key.</p>
+          </div>
+          <button class="btn btn-ghost btn-small" type="button" id="refreshSummary">Refresh</button>
+        </div>
+        <div class="stat-grid" id="summaryStats">
+          <div class="stat"><span class="stat-value" id="statPlayers">—</span><span class="stat-label">Players</span></div>
+          <div class="stat"><span class="stat-value" id="statMeasurements">—</span><span class="stat-label">Measurement records</span></div>
+          <div class="stat"><span class="stat-value" id="statShots">—</span><span class="stat-label">Shot records</span></div>
+          <div class="stat"><span class="stat-value" id="statComplete">—</span><span class="stat-label">Finished all distances</span></div>
+        </div>
+        <div class="status-message" id="summaryStatus" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Pick a station</div>
+            <p>Start with your measurements, then record your shots. See what patterns appear.</p>
+          </div>
+          <span class="key-chip">Key: <strong id="homeKeyLabel">—</strong></span>
+        </div>
+
+        <div class="card-grid">
+          <a class="link-card" href="measurement.html">
+            <span class="link-icon">📏</span>
+            <span class="link-title">Measurement form</span>
+            <span class="link-desc">Height, wingspan, heart rate, reaction time, and more.</span>
+          </a>
+          <a class="link-card blue" href="shots.html">
+            <span class="link-icon">🏀</span>
+            <span class="link-title">Shot form</span>
+            <span class="link-desc">Log five shots from each of the five distances.</span>
+          </a>
+          <a class="link-card green" href="collected.html">
+            <span class="link-icon">📋</span>
+            <span class="link-title">Collected data</span>
+            <span class="link-desc">See every player, filter the table, and download a CSV.</span>
+          </a>
+          <a class="link-card purple" href="visualizations.html">
+            <span class="link-icon">📊</span>
+            <span class="link-title">Visualisations</span>
+            <span class="link-desc">Build bar charts, pie charts, scatterplots, and a correlation matrix.</span>
+          </a>
+          <a class="link-card yellow" href="top.html">
+            <span class="link-icon">🏆</span>
+            <span class="link-title">Top ten</span>
+            <span class="link-desc">Today and all-time leaderboards for six basketball challenges.</span>
+          </a>
+          <a class="link-card pink" href="activities/index.html">
+            <span class="link-icon">🧠</span>
+            <span class="link-title">Student activities</span>
+            <span class="link-desc">Seven no-code investigations with live charts and questions.</span>
+          </a>
+        </div>
+      </section>
+
+      <div class="btn-row" style="justify-content: center; margin-top: 1.5rem;">
+        <button class="btn btn-ghost btn-small" type="button" id="changeKeyButton">Change event key</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      const keyEntryCard = document.getElementById("keyEntryCard");
+      const mainCard = document.getElementById("mainCard");
+      const keyInput = document.getElementById("eventKeyInput");
+      const keyStatus = document.getElementById("keyStatus");
+      const summaryStatus = document.getElementById("summaryStatus");
+      let loadingSummary = false;
+
+      // The nav key chip links here with ?change=1 to start a fresh key entry.
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("change") === "1") {
+        Junior.clearEventKey();
+        params.delete("change");
+        const query = params.toString();
+        history.replaceState(null, "", window.location.pathname + (query ? "?" + query : "") + window.location.hash);
+      }
+
+      Junior.init({ active: "home", requireKey: false });
+      checkKey();
+
+      function checkKey() {
+        const key = Junior.eventKey();
+        if (!key) {
+          keyEntryCard.hidden = false;
+          mainCard.hidden = true;
+          keyInput.focus();
+          return;
+        }
+        keyEntryCard.hidden = true;
+        mainCard.hidden = false;
+        const label = document.getElementById("homeKeyLabel");
+        if (label) label.textContent = key.toUpperCase();
+        loadSummary();
+      }
+
+      async function loadSummary() {
+        if (loadingSummary || !Junior.eventKey()) return;
+        loadingSummary = true;
+        const button = document.getElementById("refreshSummary");
+        button.disabled = true;
+        button.textContent = "Refreshing…";
+        try {
+          const data = await Junior.loadData();
+          const players = Junior.mergePlayers(data.measurements, data.shots);
+          document.getElementById("statPlayers").textContent = players.length;
+          document.getElementById("statMeasurements").textContent = data.measurements.length;
+          document.getElementById("statShots").textContent = data.shots.length;
+          document.getElementById("statComplete").textContent = players.filter(function (player) { return player.completedShots; }).length;
+          summaryStatus.style.display = "none";
+        } catch (error) {
+          document.getElementById("statPlayers").textContent = "—";
+          document.getElementById("statMeasurements").textContent = "—";
+          document.getElementById("statShots").textContent = "—";
+          document.getElementById("statComplete").textContent = "—";
+          Junior.setStatus(summaryStatus, "Could not load the data yet. " + error.message, "error");
+        } finally {
+          loadingSummary = false;
+          button.disabled = false;
+          button.textContent = "Refresh";
+        }
+      }
+
+      function saveKey() {
+        const value = keyInput.value.trim();
+        if (!value) {
+          Junior.setStatus(keyStatus, "Type the event key first.", "error");
+          return;
+        }
+        Junior.setEventKey(value);
+        keyStatus.style.display = "none";
+        checkKey();
+      }
+
+      document.getElementById("saveKeyButton").addEventListener("click", saveKey);
+      keyInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") saveKey();
+      });
+      document.getElementById("refreshSummary").addEventListener("click", loadSummary);
+      document.getElementById("changeKeyButton").addEventListener("click", function () {
+        Junior.clearEventKey();
+        keyInput.value = "";
+        checkKey();
+      });
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted) checkKey();
+      });
+    })();
+  </script>
+</body>
+</html>

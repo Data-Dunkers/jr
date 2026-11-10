@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-averages-spread">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Averages and Spread · Data Dunkers Junior</title>
+  <meta name="description" content="Calculate mean, median, mode, range, and spread for class measurements and decide which summary is fairest.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 2 · Centre and spread</div>
+        <h1>Averages and <span>spread</span></h1>
+        <p class="hero-lead">One number can describe a group, but it can also hide a lot. Find the centre, then look at how spread out the values are.</p>
+        <div class="activity-meta">
+          <span class="badge green">Intro</span>
+          <span class="badge">20 minutes</span>
+          <span class="badge orange">Live class data</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-blue">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Choose a measurement</div>
+              <h2>What is typical?</h2>
+              <p>Switch measurements and watch the summary change.</p>
+            </div>
+            <span class="badge" id="dataBadge">Loading…</span>
+          </div>
+          <div class="form-group" style="max-width: 420px; margin-bottom: 1rem;">
+            <label for="metricSelect">Measurement</label>
+            <select id="metricSelect"></select>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-value" id="statCount">—</span><span class="stat-label">Players</span></div>
+            <div class="stat"><span class="stat-value" id="statMean">—</span><span class="stat-label">Mean</span></div>
+            <div class="stat"><span class="stat-value" id="statMedian">—</span><span class="stat-label">Median</span></div>
+            <div class="stat"><span class="stat-value" id="statMode">—</span><span class="stat-label">Mode</span></div>
+            <div class="stat"><span class="stat-value" id="statRange">—</span><span class="stat-label">Range</span></div>
+            <div class="stat"><span class="stat-value" id="statStdev">—</span><span class="stat-label">Standard deviation</span></div>
+          </div>
+          <p class="chart-note" id="metricNote"></p>
+        </div>
+
+        <div class="card card-green">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">See every player</div>
+              <h2>Values in order</h2>
+              <p>Each bar is one player. A dashed line marks the mean.</p>
+            </div>
+          </div>
+          <div id="valueChart" class="chart-box"></div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Questions</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-yellow">
+          <h2>What to do</h2>
+          <ol class="steps">
+            <li>Choose a measurement.</li>
+            <li>Write down the mean and median.</li>
+            <li>Look for an outlier — a value far from the rest.</li>
+            <li>Decide which summary is most useful and explain why.</li>
+          </ol>
+        </div>
+        <div class="card card-purple" style="margin-top: 1rem;">
+          <h3>Three summaries</h3>
+          <p><strong>Mean:</strong> add all values, divide by how many.</p>
+          <p><strong>Median:</strong> the middle value when sorted.</p>
+          <p class="mb-0"><strong>Mode:</strong> the value that appears most often.</p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Hint</h3>
+          <p class="mb-0">If the mean and median are very different, an outlier may be pulling the mean.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+
+      const questions = [
+        "Which measurement did you choose? What are its mean and median?",
+        "Which value appears most often (the mode)? If there is no mode, explain why.",
+        "Find the range. What does the range tell you about the group?",
+        "Is there an outlier? How does it affect the mean?",
+        "Would you describe this group as “mostly the same” or “quite different”? Use the spread to support your answer.",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_averages_spread_answers");
+
+      function metricText(metric) {
+        return metric.unit ? " " + metric.unit : "";
+      }
+
+      function renderStats() {
+        const key = document.getElementById("metricSelect").value;
+        const metric = Junior.metricDefinition(key);
+        const values = Junior.valuesFor(players, key);
+        const summary = Junior.summarize(values);
+        const unit = metricText(metric);
+        const decimals = metric ? metric.decimals : 1;
+
+        document.getElementById("dataBadge").textContent = values.length ? values.length + " values" : "No values yet";
+        document.getElementById("statCount").textContent = summary.count;
+        document.getElementById("statMean").textContent = summary.mean === null ? "—" : Junior.formatNumber(summary.mean, decimals) + unit;
+        document.getElementById("statMedian").textContent = summary.median === null ? "—" : Junior.formatNumber(summary.median, decimals) + unit;
+        document.getElementById("statMode").textContent = !summary.mode.length ? "No mode" : summary.mode.map(function (value) { return Junior.formatNumber(value, decimals); }).join(", ") + unit;
+        document.getElementById("statRange").textContent = summary.range === null ? "—" : Junior.formatNumber(summary.range, decimals) + unit;
+        document.getElementById("statStdev").textContent = summary.stdev === null ? "—" : Junior.formatNumber(summary.stdev, decimals) + unit;
+        document.getElementById("metricNote").textContent = summary.count
+          ? "Mean = " + Junior.formatNumber(summary.mean, decimals) + unit + " · Median = " + Junior.formatNumber(summary.median, decimals) + unit + " · Range = " + Junior.formatNumber(summary.range, decimals) + unit + "."
+          : "No values yet for this measurement.";
+
+        const entries = players.filter(function (player) {
+          const value = Junior.metricValue(player, key);
+          return value !== null && Number.isFinite(value);
+        }).map(function (player) {
+          return { nickname: player.nickname, value: Junior.metricValue(player, key) };
+        }).sort(function (a, b) { return a.value - b.value; });
+
+        if (!entries.length) {
+          Junior.emptyChart("valueChart", "No values yet for this measurement.");
+          return;
+        }
+
+        const traces = [{
+          type: "bar",
+          x: entries.map(function (entry) { return entry.nickname; }),
+          y: entries.map(function (entry) { return entry.value; }),
+          marker: { color: "#2f80ed", line: { color: "#fff", width: 2 } },
+          hovertemplate: "%{x}<br>" + (metric ? metric.label : key) + ": %{y}<extra></extra>",
+        }];
+        if (summary.mean !== null) {
+          traces.push({
+            type: "scatter",
+            mode: "lines",
+            x: [entries[0].nickname, entries[entries.length - 1].nickname],
+            y: [summary.mean, summary.mean],
+            name: "Mean",
+            line: { color: "#ff7a1a", dash: "dash", width: 3 },
+            hoverinfo: "skip",
+          });
+        }
+        Junior.plot("valueChart", traces, {
+          title: { text: (metric ? metric.label : key) + " for each player", x: 0, font: { size: 16 } },
+          xaxis: { title: "Player", tickangle: -35, automargin: true },
+          yaxis: { title: (metric ? metric.label : key) + (metric && metric.unit ? " (" + metric.unit + ")" : "") },
+          showlegend: false,
+          margin: { b: 90 },
+        });
+      }
+
+      function setupSelect() {
+        const select = document.getElementById("metricSelect");
+        Junior.NUMERIC_METRICS.forEach(function (metric) {
+          const option = document.createElement("option");
+          option.value = metric.key;
+          option.textContent = metric.label + (metric.unit ? " (" + metric.unit + ")" : "");
+          if (metric.key === "reaction_time_ms") option.selected = true;
+          select.appendChild(option);
+        });
+        select.addEventListener("change", renderStats);
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          renderStats();
+          Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("valueChart", "Data is not available yet.");
+        }
+      }
+
+      setupSelect();
+      load();
+    })();
+  </script>
+</body>
+</html>

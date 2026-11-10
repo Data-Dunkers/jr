@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-page="activity-chart-interpretation">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart Interpretation · Data Dunkers Junior</title>
+  <meta name="description" content="Read a live shot chart, find the highest and lowest averages, and explain the pattern.">
+  <link rel="icon" href="../assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="../app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="activity-hero">
+      <div>
+        <div class="eyebrow">Activity 1 · Visual literacy</div>
+        <h1>Chart <span>interpretation</span></h1>
+        <p class="hero-lead">A chart is a picture of a claim. Your job is to read the picture carefully before you decide what it means.</p>
+        <div class="activity-meta">
+          <span class="badge green">Intro</span>
+          <span class="badge">15 minutes</span>
+          <span class="badge orange">Live class data</span>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="index.html">All activities</a>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <div class="activity-layout section">
+      <div>
+        <div class="card card-accent">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Look first</div>
+              <h2>Average shots made by distance</h2>
+              <p>Each bar is the class average at that distance. Hover over a bar to see how many players are included.</p>
+            </div>
+            <span class="badge" id="dataBadge">Loading…</span>
+          </div>
+          <div id="shotChart" class="chart-box"></div>
+          <p class="chart-note" id="chartNote">Waiting for live data.</p>
+        </div>
+
+        <div class="card card-blue">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Evidence table</div>
+              <h2>The numbers behind the bars</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Distance</th><th class="num">Average made</th><th class="num">Players</th><th class="num">Percentage</th></tr></thead>
+              <tbody id="summaryBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Your turn</div>
+              <h2>Questions</h2>
+              <p>Use numbers from the chart or table in every answer. Save your work as you go.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div id="questions"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sticky-card">
+        <div class="card card-yellow">
+          <h2>What to do</h2>
+          <ol class="steps">
+            <li>Read the title and both axes. What is being compared?</li>
+            <li>Find the highest and lowest bars. Write down their values.</li>
+            <li>Describe the pattern from 2 ft to 10 ft.</li>
+            <li>Ask what the chart does <em>not</em> show.</li>
+          </ol>
+        </div>
+        <div class="card card-green" style="margin-top: 1rem;">
+          <h3>Word bank</h3>
+          <p class="mb-0"><strong>average</strong> · <strong>distance</strong> · <strong>highest</strong> · <strong>lowest</strong> · <strong>pattern</strong> · <strong>evidence</strong> · <strong>outlier</strong></p>
+        </div>
+        <div class="card card-pink" style="margin-top: 1rem;">
+          <h3>Hint</h3>
+          <p class="mb-0">A strong answer sounds like: “The average at 2 ft was 3.8 out of 5, which is higher than the average at 10 ft.”</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "activities" });
+      let players = [];
+
+      const questions = [
+        "Which distance has the highest average number of shots made? What is the average?",
+        "Which distance has the lowest average? What is the average?",
+        "Describe the pattern as the distance increases from 2 ft to 10 ft. Does it go up, go down, or stay about the same?",
+        "Why might the pattern make sense in basketball? Use your own words.",
+        "What else would you want to know before saying “shorter shots are always easier”? Name at least one thing the chart does not show.",
+      ];
+      Junior.renderQuestions("questions", questions, "junior_chart_interpretation_answers");
+
+      function renderSummary() {
+        const rows = Junior.shotPercentageByDistance(players);
+        const body = document.getElementById("summaryBody");
+        body.innerHTML = "";
+        const hasData = rows.some(function (row) { return row.average !== null; });
+        if (!hasData) {
+          body.innerHTML = '<tr><td colspan="4" class="table-empty">No shot data yet. Use the shot form, then refresh this page.</td></tr>';
+          return;
+        }
+        rows.forEach(function (row) {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + row.distance + " ft</td>" +
+            '<td class="num">' + (row.average === null ? "—" : Junior.formatNumber(row.average, 2)) + "</td>" +
+            '<td class="num">' + row.count + "</td>" +
+            '<td class="num">' + (row.percentage === null ? "—" : Junior.formatNumber(row.percentage, 1) + "%") + "</td>";
+          body.appendChild(tr);
+        });
+      }
+
+      async function load() {
+        Junior.setStatus("loadStatus", "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          const shotResults = players.reduce(function (sum, player) { return sum + player.recordedDistances.length; }, 0);
+          document.getElementById("dataBadge").textContent = shotResults ? shotResults + " shot results" : "No shot data";
+          Junior.shotProfileChart("shotChart", players, { title: "Average shots made by distance" });
+          renderSummary();
+          const rows = Junior.shotAverages(players).filter(function (row) { return row.average !== null; });
+          if (!rows.length) {
+            document.getElementById("chartNote").textContent = "The chart is empty because no shot data has been collected for this event key.";
+            Junior.setStatus("loadStatus", "No shot data yet. Collect shots, then come back.", "error");
+          } else {
+            const highest = rows.slice().sort(function (a, b) { return b.average - a.average; })[0];
+            const lowest = rows.slice().sort(function (a, b) { return a.average - b.average; })[0];
+            document.getElementById("chartNote").textContent = "Highest: " + highest.distance + " ft (" + Junior.formatNumber(highest.average, 2) + "). Lowest: " + lowest.distance + " ft (" + Junior.formatNumber(lowest.average, 2) + ").";
+            Junior.setStatus("loadStatus", "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + ".", "success");
+          }
+        } catch (error) {
+          Junior.setStatus("loadStatus", "Could not load the data. " + error.message, "error");
+          Junior.emptyChart("shotChart", "Data is not available yet.");
+        }
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

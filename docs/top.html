@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-page="top">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Ten · Data Dunkers Junior</title>
+  <meta name="description" content="See today's and all-time top-ten leaderboards for shooting, reaction time, free throws, passing, finishing, and height.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero" style="padding-bottom: 0.5rem;">
+      <div class="hero-copy">
+        <div class="eyebrow">Friendly competition</div>
+        <h1>Top <span>ten</span></h1>
+        <p class="hero-lead">Six leaderboards from the same class dataset. Switch between today and all-time, then see who is leading each challenge.</p>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="todayButton">Today</button>
+          <button type="button" class="btn btn-ghost" id="allTimeButton">All-time</button>
+          <button type="button" class="btn btn-ghost" id="refreshButton">Refresh</button>
+        </div>
+        <p class="small muted" id="periodLabel" style="margin-top: 0.8rem;">Showing today's records.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true" style="min-height: 170px;">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <section class="section">
+      <div class="card-grid two">
+        <section class="leaderboard">
+          <h2>🏀 Top shooters</h2>
+          <p class="leaderboard-sub">Average shots made across all five distances. Only players with all five distances appear.</p>
+          <div class="table-wrap">
+            <table id="shootersTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Average</th><th class="num">Total</th><th class="num">2 ft</th><th class="num">4 ft</th><th class="num">6 ft</th><th class="num">8 ft</th><th class="num">10 ft</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="leaderboard">
+          <h2>⚡ Quickest reaction</h2>
+          <p class="leaderboard-sub">Lowest average reaction time from the three-trial test.</p>
+          <div class="table-wrap">
+            <table id="reactionTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Reaction (ms)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="leaderboard">
+          <h2>🎯 Free-throw leaders</h2>
+          <p class="leaderboard-sub">Most free throws made out of five attempts.</p>
+          <div class="table-wrap">
+            <table id="freeThrowTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Made</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="leaderboard">
+          <h2>💨 Fastest passers</h2>
+          <p class="leaderboard-sub">Shortest time to complete ten chest passes.</p>
+          <div class="table-wrap">
+            <table id="passTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Time (s)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="leaderboard">
+          <h2>🏁 First to finish</h2>
+          <p class="leaderboard-sub">First players to complete a measurement and all five shot distances.</p>
+          <div class="table-wrap">
+            <table id="finishTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th>Finished</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="leaderboard">
+          <h2>📏 Tallest</h2>
+          <p class="leaderboard-sub">Highest recorded height in centimetres.</p>
+          <div class="table-wrap">
+            <table id="heightTable">
+              <thead><tr><th class="rank">#</th><th>Player</th><th class="num">Height (cm)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <div class="card card-yellow">
+      <div class="card-title-row">
+        <div>
+          <div class="eyebrow">Good sport</div>
+          <h2>Leaderboards are a snapshot</h2>
+        </div>
+      </div>
+      <p class="mb-0">A leaderboard shows who had the best result in this dataset, at this moment. It does not show who practised the most, who improved the most, or who helped their team. Use it as a conversation starter, not a label.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "top" });
+
+      let mode = "today";
+      let allMeasurements = [];
+      let allShots = [];
+      let loading = false;
+
+      const loadStatus = document.getElementById("loadStatus");
+
+      function setPeriodUI() {
+        const today = mode === "today";
+        document.getElementById("todayButton").className = "btn " + (today ? "btn-primary" : "btn-ghost");
+        document.getElementById("allTimeButton").className = "btn " + (today ? "btn-ghost" : "btn-primary");
+        document.getElementById("periodLabel").textContent = today
+          ? "Showing records saved today (" + Junior.todayKey() + ")."
+          : "Showing every record saved with this event key.";
+      }
+
+      function recordsForMode() {
+        if (mode === "all") return { measurements: allMeasurements, shots: allShots };
+        return {
+          measurements: allMeasurements.filter(Junior.isToday),
+          shots: allShots.filter(Junior.isToday),
+        };
+      }
+
+      function renderRows(tableId, rows, columns, emptyMessage) {
+        const tbody = document.querySelector("#" + tableId + " tbody");
+        tbody.innerHTML = "";
+        if (!rows.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = columns.length;
+          cell.className = "table-empty";
+          cell.textContent = emptyMessage || "No results yet.";
+          row.appendChild(cell);
+          tbody.appendChild(row);
+          return;
+        }
+        rows.forEach(function (item, index) {
+          const row = document.createElement("tr");
+          columns.forEach(function (column, columnIndex) {
+            const cell = document.createElement("td");
+            if (columnIndex === 0) cell.className = "rank";
+            if (column.className) cell.className += " " + column.className;
+            cell.textContent = column.value(item, index);
+            row.appendChild(cell);
+          });
+          tbody.appendChild(row);
+        });
+      }
+
+      function rankColumn() {
+        return { value: function (_, index) { return String(index + 1); } };
+      }
+
+      function renderShooters(players) {
+        const rows = players.filter(function (player) {
+          return player.completedShots;
+        }).sort(function (a, b) {
+          return b.shotAverage - a.shotAverage || a.nickname.localeCompare(b.nickname);
+        }).slice(0, 10);
+        renderRows("shootersTable", rows, [
+          rankColumn(),
+          { value: function (player) { return player.nickname; } },
+          { className: "num", value: function (player) { return Junior.formatNumber(player.shotAverage, 2) + " / 5"; } },
+          { className: "num", value: function (player) { return player.totalShots + " / 25"; } },
+          { className: "num", value: function (player) { return player.shots[2] == null ? "—" : player.shots[2]; } },
+          { className: "num", value: function (player) { return player.shots[4] == null ? "—" : player.shots[4]; } },
+          { className: "num", value: function (player) { return player.shots[6] == null ? "—" : player.shots[6]; } },
+          { className: "num", value: function (player) { return player.shots[8] == null ? "—" : player.shots[8]; } },
+          { className: "num", value: function (player) { return player.shots[10] == null ? "—" : player.shots[10]; } },
+        ], "No player has all five distances yet.");
+      }
+
+      function renderMeasurements(players, tableId, metricKey, ascending, emptyMessage, formatter) {
+        const rows = players.filter(function (player) {
+          return player.measurement && Junior.finiteNumber(player.measurement[metricKey]) !== null;
+        }).sort(function (a, b) {
+          const aValue = Junior.finiteNumber(a.measurement[metricKey]);
+          const bValue = Junior.finiteNumber(b.measurement[metricKey]);
+          return ascending ? aValue - bValue : bValue - aValue;
+        }).slice(0, 10);
+        renderRows(tableId, rows, [
+          rankColumn(),
+          { value: function (player) { return player.nickname; } },
+          { className: "num", value: function (player) { return formatter(Junior.finiteNumber(player.measurement[metricKey])); } },
+        ], emptyMessage);
+      }
+
+      function finishTime(player) {
+        if (!player.measurement || !player.completedShots) return null;
+        const times = [Junior.recordTime(player.measurement)].concat(player.shotRecords.map(Junior.recordTime)).filter(Number.isFinite);
+        return times.length ? Math.max.apply(null, times) : null;
+      }
+
+      function renderFinish(players) {
+        const rows = players.map(function (player) {
+          return { player: player, finish: finishTime(player) };
+        }).filter(function (row) { return row.finish !== null; }).sort(function (a, b) {
+          return a.finish - b.finish || a.player.nickname.localeCompare(b.player.nickname);
+        }).slice(0, 10);
+        renderRows("finishTable", rows, [
+          rankColumn(),
+          { value: function (row) { return row.player.nickname; } },
+          { value: function (row) { return Junior.formatDate({ created: new Date(row.finish).toISOString() }); } },
+        ], "No one has finished all five distances yet.");
+      }
+
+      function renderAll() {
+        const records = recordsForMode();
+        const players = Junior.mergePlayers(records.measurements, records.shots);
+        renderShooters(players);
+        renderMeasurements(players, "reactionTable", "reaction_time_ms", true, "No reaction-time results yet.", function (value) { return value == null ? "—" : value + " ms"; });
+        renderMeasurements(players, "freeThrowTable", "free_throws_made", false, "No free-throw results yet.", function (value) { return value == null ? "—" : value + " / 5"; });
+        renderMeasurements(players, "passTable", "ten_pass_seconds", true, "No 10-pass times yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 2) + " s"; });
+        renderMeasurements(players, "heightTable", "height_cm", false, "No height measurements yet.", function (value) { return value == null ? "—" : Junior.formatNumber(value, 1) + " cm"; });
+        renderFinish(players);
+        const complete = players.filter(function (player) { return player.completedShots && player.measurement; }).length;
+        if (!players.length) {
+          Junior.setStatus(loadStatus, mode === "today" ? "No records have been saved today yet. Try all-time or collect some data." : "No records have been saved with this event key yet.", "info");
+        } else {
+          Junior.setStatus(loadStatus, "Showing " + players.length + " player" + (players.length === 1 ? "" : "s") + " · " + complete + " finished all five distances.", "success");
+        }
+      }
+
+      async function refresh() {
+        if (loading) return;
+        loading = true;
+        const button = document.getElementById("refreshButton");
+        button.disabled = true;
+        button.textContent = "Loading…";
+        try {
+          const data = await Junior.loadData();
+          allMeasurements = data.measurements;
+          allShots = data.shots;
+          renderAll();
+        } catch (error) {
+          Junior.setStatus(loadStatus, "Could not load the leaderboards. " + error.message, "error");
+        } finally {
+          loading = false;
+          button.disabled = false;
+          button.textContent = "Refresh";
+        }
+      }
+
+      document.getElementById("todayButton").addEventListener("click", function () {
+        mode = "today";
+        setPeriodUI();
+        renderAll();
+      });
+      document.getElementById("allTimeButton").addEventListener("click", function () {
+        mode = "all";
+        setPeriodUI();
+        renderAll();
+      });
+      document.getElementById("refreshButton").addEventListener("click", refresh);
+
+      setPeriodUI();
+      refresh();
+    })();
+  </script>
+</body>
+</html>

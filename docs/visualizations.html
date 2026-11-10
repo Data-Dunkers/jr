@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-page="visualizations">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualisations · Data Dunkers Junior</title>
+  <meta name="description" content="Explore live class data with bar charts, pie charts, scatterplots, a shot profile, and a correlation matrix.">
+  <link rel="icon" href="assets/datadunkers-mark.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+  <header class="site-header" id="site-nav"></header>
+
+  <main class="page-shell">
+    <section class="hero" style="padding-bottom: 0.5rem;">
+      <div class="hero-copy">
+        <div class="eyebrow">Make the data visible</div>
+        <h1>Visual<span>isations</span></h1>
+        <p class="hero-lead">Charts turn a table into a story. Start with the shot profile, then build your own bar chart, pie chart, scatterplot, and correlation matrix from live class data.</p>
+        <div class="pill-row">
+          <span class="badge">Live data only</span>
+          <span class="badge green">No coding needed</span>
+          <span class="badge purple">Try more than one chart</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true" style="min-height: 170px;">
+        <img src="assets/datadunkers-logo.png" alt="">
+      </div>
+    </section>
+
+    <div id="loadStatus" class="status-message" role="status" aria-live="polite"></div>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">First look</div>
+          <h2>Shot profile</h2>
+          <p>Each bar is the average number of shots made at that distance. Hover over a bar to see how many players are behind it.</p>
+        </div>
+        <span class="badge orange" id="shotBadge">Loading…</span>
+      </div>
+      <div class="card">
+        <div id="shotProfile" class="chart-box"></div>
+        <p class="chart-note" id="shotProfileNote">Waiting for shot records.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Build a chart</div>
+          <h2>Bar chart explorer</h2>
+          <p>Compare the average measurement for different groups. For example: average reaction time by handedness.</p>
+        </div>
+      </div>
+      <div class="card card-blue">
+        <div class="chart-controls">
+          <div class="form-group">
+            <label for="barCategory">Group players by</label>
+            <select id="barCategory"></select>
+          </div>
+          <div class="form-group">
+            <label for="barMetric">Measure</label>
+            <select id="barMetric"></select>
+          </div>
+        </div>
+        <div id="barPlot" class="chart-box"></div>
+        <p class="chart-note" id="barNote">Choose a group and a measurement.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card-grid two">
+        <div class="card card-green">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Part of a whole</div>
+              <h2>Pie chart</h2>
+              <p>See how players are split across one category.</p>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.8rem;">
+            <label for="pieCategory">Category</label>
+            <select id="pieCategory"></select>
+          </div>
+          <div id="piePlot" class="chart-box short"></div>
+          <p class="chart-note" id="pieNote"></p>
+        </div>
+
+        <div class="card card-purple">
+          <div class="card-title-row">
+            <div>
+              <div class="eyebrow">Relationship</div>
+              <h2>Scatterplot</h2>
+              <p>Look for a pattern between two measurements.</p>
+            </div>
+          </div>
+          <div class="chart-controls">
+            <div class="form-group">
+              <label for="scatterX">Horizontal axis</label>
+              <select id="scatterX"></select>
+            </div>
+            <div class="form-group">
+              <label for="scatterY">Vertical axis</label>
+              <select id="scatterY"></select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.8rem;">
+            <label for="scatterColour">Colour by (optional)</label>
+            <select id="scatterColour"></select>
+          </div>
+          <div id="scatterPlot" class="chart-box"></div>
+          <p class="chart-note" id="scatterNote"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Many relationships at once</div>
+          <h2>Correlation matrix</h2>
+          <p>Orange means a positive relationship, blue means a negative relationship, and pale colours mean little or no straight-line relationship. The value <strong>r</strong> runs from −1 to 1.</p>
+        </div>
+      </div>
+      <div class="card card-pink">
+        <div id="corrPlot" class="chart-box" style="min-height: 460px;"></div>
+        <p class="chart-note">A correlation is a clue, not proof. Two things can move together without one causing the other.</p>
+      </div>
+    </section>
+
+    <div class="card card-yellow">
+      <div class="card-title-row">
+        <div>
+          <div class="eyebrow">Chart detective</div>
+          <h2>Three questions to ask every chart</h2>
+        </div>
+      </div>
+      <div class="card-grid three">
+        <div><h3>1. What is being compared?</h3><p class="mb-0">Read the title and both axes. What does each bar, point, or slice stand for?</p></div>
+        <div><h3>2. What is the pattern?</h3><p class="mb-0">Is it going up, going down, clustered, or spread out? Is there an outlier?</p></div>
+        <div><h3>3. What is missing?</h3><p class="mb-0">How many players are in each group? Could a different chart change the story?</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script>
+    (function () {
+      Junior.init({ active: "visualizations" });
+
+      let players = [];
+      let loaded = false;
+      const loadStatus = document.getElementById("loadStatus");
+      const categoryOptions = Junior.CATEGORICAL_METRICS.slice();
+      const scatterMetrics = Junior.NUMERIC_METRICS.filter(function (metric) {
+        return ["shot_total", "shot_percentage", "shot_average"].indexOf(metric.key) === -1;
+      });
+
+      function fillSelect(select, options, selectedValue) {
+        select.innerHTML = "";
+        options.forEach(function (option) {
+          const item = document.createElement("option");
+          item.value = option.key;
+          item.textContent = option.label;
+          if (option.key === selectedValue) item.selected = true;
+          select.appendChild(item);
+        });
+      }
+
+      function setupControls() {
+        fillSelect(document.getElementById("barCategory"), categoryOptions, "handedness");
+        fillSelect(document.getElementById("barMetric"), Junior.NUMERIC_METRICS, "height_cm");
+        fillSelect(document.getElementById("pieCategory"), categoryOptions, "handedness");
+        fillSelect(document.getElementById("scatterX"), scatterMetrics, "height_cm");
+        fillSelect(document.getElementById("scatterY"), scatterMetrics, "wingspan_cm");
+        const colourOptions = [{ key: "", label: "One colour" }].concat(categoryOptions);
+        fillSelect(document.getElementById("scatterColour"), colourOptions, "");
+
+        ["barCategory", "barMetric"].forEach(function (id) {
+          document.getElementById(id).addEventListener("change", drawBar);
+        });
+        document.getElementById("pieCategory").addEventListener("change", drawPie);
+        ["scatterX", "scatterY", "scatterColour"].forEach(function (id) {
+          document.getElementById(id).addEventListener("change", drawScatter);
+        });
+      }
+
+      function drawShotProfile() {
+        Junior.shotProfileChart("shotProfile", players, { title: "Average shots made by distance" });
+        const rows = Junior.shotAverages(players);
+        const count = rows.reduce(function (sum, row) { return sum + row.count; }, 0);
+        document.getElementById("shotBadge").textContent = count ? count + " shot results" : "No shot data";
+        const best = rows.filter(function (row) { return row.average !== null; }).sort(function (a, b) { return b.average - a.average; })[0];
+        document.getElementById("shotProfileNote").textContent = best
+          ? "Highest average: " + best.distance + " ft (" + Junior.formatNumber(best.average, 1) + " out of 5), based on " + best.count + " player result" + (best.count === 1 ? "" : "s") + "."
+          : "No shot data has been collected yet. Use the shot form first.";
+      }
+
+      function drawBar() {
+        const category = document.getElementById("barCategory").value;
+        const metricKey = document.getElementById("barMetric").value;
+        const metric = Junior.metricDefinition(metricKey);
+        const groups = Junior.groupBy(players, category);
+        const rows = Array.from(groups.entries()).map(function (entry) {
+          const values = Junior.valuesFor(entry[1], metricKey);
+          return { label: entry[0], count: entry[1].length, value: values.length ? Junior.mean(values) : null };
+        }).filter(function (row) { return row.value !== null; }).sort(function (a, b) { return b.value - a.value; });
+
+        if (!rows.length) {
+          Junior.emptyChart("barPlot", "No complete values for this group and measurement yet.");
+          document.getElementById("barNote").textContent = "Try another measurement or collect more data.";
+          return;
+        }
+
+        Junior.plot("barPlot", [{
+          type: "bar",
+          x: rows.map(function (row) { return row.label; }),
+          y: rows.map(function (row) { return row.value; }),
+          text: rows.map(function (row) { return Junior.formatNumber(row.value, metric ? metric.decimals : 1) + (metric && metric.unit ? " " + metric.unit : ""); }),
+          textposition: "outside",
+          marker: { color: Junior.CHART_COLOURS, line: { color: "#fff", width: 2 } },
+          customdata: rows.map(function (row) { return row.count; }),
+          hovertemplate: "%{x}<br>Average: %{y:.2f}<br>Players: %{customdata}<extra></extra>",
+          cliponaxis: false,
+        }], {
+          title: { text: "Average " + (metric ? metric.label.toLowerCase() : metricKey) + " by " + category.replace("_", " "), x: 0, font: { size: 16 } },
+          xaxis: { title: category.replace("_", " ") },
+          yaxis: { title: metric ? metric.label + (metric.unit ? " (" + metric.unit + ")" : "") : metricKey },
+          showlegend: false,
+        });
+        document.getElementById("barNote").textContent = "Each bar is the average for " + rows.length + " group" + (rows.length === 1 ? "" : "s") + ". The number of players behind each bar is in the hover text.";
+      }
+
+      function drawPie() {
+        const category = document.getElementById("pieCategory").value;
+        const groups = Junior.groupBy(players, category);
+        const rows = Array.from(groups.entries()).map(function (entry) {
+          return { label: entry[0], count: entry[1].length };
+        }).sort(function (a, b) { return b.count - a.count; });
+
+        if (!rows.length) {
+          Junior.emptyChart("piePlot", "No category data has been collected yet.");
+          document.getElementById("pieNote").textContent = "";
+          return;
+        }
+
+        Junior.plot("piePlot", [{
+          type: "pie",
+          labels: rows.map(function (row) { return row.label; }),
+          values: rows.map(function (row) { return row.count; }),
+          hole: 0.42,
+          marker: { colors: Junior.CHART_COLOURS, line: { color: "#fff", width: 2 } },
+          textinfo: "label+percent",
+          hovertemplate: "%{label}<br>%{value} player(s)<br>%{percent}<extra></extra>",
+        }], {
+          title: { text: "Players by " + category.replace("_", " "), x: 0, font: { size: 16 } },
+          showlegend: false,
+          margin: { t: 48, r: 12, b: 18, l: 12 },
+        });
+        const biggest = rows[0];
+        document.getElementById("pieNote").textContent = "Largest group: " + biggest.label + " (" + biggest.count + " player" + (biggest.count === 1 ? "" : "s") + ").";
+      }
+
+      function drawScatter() {
+        const xKey = document.getElementById("scatterX").value;
+        const yKey = document.getElementById("scatterY").value;
+        const colourKey = document.getElementById("scatterColour").value;
+        const xMetric = Junior.metricDefinition(xKey);
+        const yMetric = Junior.metricDefinition(yKey);
+        const valid = players.filter(function (player) {
+          const x = Junior.metricValue(player, xKey);
+          const y = Junior.metricValue(player, yKey);
+          return x !== null && y !== null && Number.isFinite(x) && Number.isFinite(y);
+        });
+
+        if (valid.length < 2) {
+          Junior.emptyChart("scatterPlot", "Two or more players with both measurements are needed for a scatterplot.");
+          document.getElementById("scatterNote").textContent = "Collect more complete measurements to see a relationship.";
+          return;
+        }
+
+        const traces = [];
+        if (colourKey) {
+          const groups = Junior.groupBy(valid, colourKey);
+          groups.forEach(function (entry, index) {
+            traces.push({
+              type: "scatter",
+              mode: "markers",
+              name: entry[0],
+              x: entry[1].map(function (player) { return Junior.metricValue(player, xKey); }),
+              y: entry[1].map(function (player) { return Junior.metricValue(player, yKey); }),
+              text: entry[1].map(function (player) { return player.nickname; }),
+              hovertemplate: "%{text}<br>" + (xMetric ? xMetric.label : xKey) + ": %{x}<br>" + (yMetric ? yMetric.label : yKey) + ": %{y}<extra></extra>",
+              marker: { size: 12, color: Junior.CHART_COLOURS[index % Junior.CHART_COLOURS.length], line: { color: "#fff", width: 2 } },
+            });
+          });
+        } else {
+          traces.push({
+            type: "scatter",
+            mode: "markers",
+            x: valid.map(function (player) { return Junior.metricValue(player, xKey); }),
+            y: valid.map(function (player) { return Junior.metricValue(player, yKey); }),
+            text: valid.map(function (player) { return player.nickname; }),
+            hovertemplate: "%{text}<br>" + (xMetric ? xMetric.label : xKey) + ": %{x}<br>" + (yMetric ? yMetric.label : yKey) + ": %{y}<extra></extra>",
+            marker: { size: 13, color: "#ff7a1a", line: { color: "#fff", width: 2 } },
+            name: "Players",
+          });
+        }
+
+        const xValues = valid.map(function (player) { return Junior.metricValue(player, xKey); });
+        const yValues = valid.map(function (player) { return Junior.metricValue(player, yKey); });
+        const regression = Junior.linearRegression(xValues, yValues);
+        const r = Junior.pearson(xValues, yValues);
+        if (regression) {
+          traces.push({
+            type: "scatter",
+            mode: "lines",
+            name: "Trend line",
+            x: [regression.minX, regression.maxX],
+            y: [regression.slope * regression.minX + regression.intercept, regression.slope * regression.maxX + regression.intercept],
+            line: { color: "#1e2a44", dash: "dash", width: 2 },
+            hoverinfo: "skip",
+            showlegend: false,
+          });
+        }
+
+        const annotations = r === null ? [] : [{
+          text: "r = " + r.toFixed(2),
+          xref: "paper",
+          yref: "paper",
+          x: 0.02,
+          y: 0.98,
+          showarrow: false,
+          align: "left",
+          bgcolor: "rgba(255,255,255,0.9)",
+          bordercolor: "#e3e9f3",
+          borderwidth: 1,
+          font: { size: 13, color: "#1e2a44", family: "Nunito" },
+        }];
+
+        Junior.plot("scatterPlot", traces, {
+          title: { text: (yMetric ? yMetric.label : yKey) + " vs " + (xMetric ? xMetric.label : xKey), x: 0, font: { size: 16 } },
+          xaxis: { title: xMetric ? xMetric.label + (xMetric.unit ? " (" + xMetric.unit + ")" : "") : xKey },
+          yaxis: { title: yMetric ? yMetric.label + (yMetric.unit ? " (" + yMetric.unit + ")" : "") : yKey },
+          annotations: annotations,
+          showlegend: Boolean(colourKey),
+        });
+
+        let strength = "little or no straight-line relationship";
+        if (r !== null) {
+          const absolute = Math.abs(r);
+          if (absolute >= 0.7) strength = "a strong";
+          else if (absolute >= 0.4) strength = "a moderate";
+          else if (absolute >= 0.2) strength = "a weak";
+          else strength = "little or no";
+        }
+        document.getElementById("scatterNote").textContent = r === null
+          ? "There are " + valid.length + " players with both measurements."
+          : "There is " + strength + " relationship (r = " + r.toFixed(2) + ") across " + valid.length + " players. A trend line is a summary, not a rule.";
+      }
+
+      function drawCorrelation() {
+        Junior.correlationHeatmap("corrPlot", players, [
+          "basketball_interest", "resting_heart_rate", "height_cm", "wingspan_cm", "hand_span_cm",
+          "shoe_size", "reaction_time_ms", "free_throws_made", "ten_pass_seconds", "shot_total"
+        ], { title: "Correlation matrix for class measurements" });
+      }
+
+      function renderAll() {
+        drawShotProfile();
+        drawBar();
+        drawPie();
+        drawScatter();
+        drawCorrelation();
+      }
+
+      async function load() {
+        Junior.setStatus(loadStatus, "Loading live class data…", "info");
+        try {
+          const data = await Junior.loadData();
+          players = Junior.mergePlayers(data.measurements, data.shots);
+          loaded = true;
+          if (!players.length) {
+            Junior.setStatus(loadStatus, "No records yet for this event key. Collect a measurement and some shots, then refresh.", "error");
+          } else {
+            Junior.setStatus(loadStatus, "Loaded " + players.length + " player" + (players.length === 1 ? "" : "s") + " from the live dataset.", "success");
+          }
+          renderAll();
+        } catch (error) {
+          loaded = false;
+          Junior.setStatus(loadStatus, "Could not load the live data. " + error.message, "error");
+          Junior.emptyChart("shotProfile", "Data is not available yet.");
+          Junior.emptyChart("barPlot", "Data is not available yet.");
+          Junior.emptyChart("piePlot", "Data is not available yet.");
+          Junior.emptyChart("scatterPlot", "Data is not available yet.");
+          Junior.emptyChart("corrPlot", "Data is not available yet.");
+        }
+      }
+
+      setupControls();
+      load();
+    })();
+  </script>
+</body>
+</html>
