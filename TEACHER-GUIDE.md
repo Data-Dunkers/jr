@@ -1,12 +1,12 @@
 # Data Dunkers Junior — teacher guide
 
-## Big idea
+## Big Idea
 
 Students collect their own basketball data, then use it to make and check claims. The goal is not to memorise formulas. The goal is to ask good questions, choose useful evidence, and explain what the numbers mean.
 
 The site is designed for grade 5 and 6 students and works well in a gym, classroom, or blended lesson.
 
-## Learning goals
+## Learning Goals
 
 By the end of the sequence, students can:
 
@@ -18,7 +18,7 @@ By the end of the sequence, students can:
 - recognise a truncated axis and a cherry-picked comparison;
 - write a short data story with a claim, evidence, and a limitation.
 
-## Curriculum connections
+## Curriculum Connections
 
 The activities support common grade 5/6 expectations in:
 
@@ -30,7 +30,7 @@ The activities support common grade 5/6 expectations in:
 
 Check your local curriculum for exact outcomes and adjust the language as needed.
 
-## Before the lesson
+## Before The Lesson
 
 ### 1. Confirm the backend
 
@@ -75,9 +75,9 @@ Students can share devices, but each student needs a unique nickname. The format
 
 Ask students to write their nickname on a card or in their notebook. The site remembers the last nickname in the browser, but shared devices can mix students up.
 
-## Suggested lesson sequences
+## Suggested Lesson Sequences
 
-### Option A: three 45-minute sessions
+### Option A: Three 45-Minute Sessions
 
 **Session 1 — Collect**
 
@@ -97,14 +97,14 @@ Ask students to write their nickname on a card or in their notebook. The site re
 - 25 min: students complete Scatterplots and Relationships or Shots and Percentages.
 - 10 min: exit ticket — one claim, one piece of evidence, one limitation.
 
-### Option B: four 40-minute sessions
+### Option B: Four 40-Minute Sessions
 
 1. Collect and check data.
 2. Chart interpretation + averages and spread.
 3. Shots, percentages, and probability.
 4. Misleading graphs + data storytelling.
 
-### Option C: one enrichment day
+### Option C: One Enrichment Day
 
 Use the full sequence as a data festival:
 
@@ -116,7 +116,7 @@ Use the full sequence as a data festival:
 - 20 min misleading graphs
 - 30 min data storytelling and sharing
 
-## Activity-by-activity notes
+## Activity-By-Activity Notes
 
 ### 1. Chart interpretation
 
@@ -176,7 +176,7 @@ Use the full sequence as a data festival:
 
 ## Assessment
 
-### Quick exit ticket
+### Quick Exit Ticket
 
 > One thing I noticed: ______
 > One number that supports it: ______
@@ -191,7 +191,7 @@ Use the full sequence as a data festival:
 | **Secure** | Makes a clear claim, cites appropriate evidence, and explains the pattern. |
 | **Strong** | Uses evidence precisely, considers an alternative explanation, and names a limitation. |
 
-### What to listen for
+### What To Listen For
 
 - “The average at 2 ft was higher than at 10 ft.”
 - “There is a positive relationship, but that does not prove cause.”
@@ -216,7 +216,7 @@ Use the full sequence as a data festival:
 - Have students create a one-slide story for a younger class.
 - Ask students to compare two groups with very different sample sizes.
 
-## Safety, privacy, and fair use
+## Safety, Privacy, And Fair Use
 
 - Use nicknames, not full names, in the public data table.
 - Do not collect sensitive health information beyond the class activity.
@@ -237,11 +237,11 @@ Use the full sequence as a data festival:
 | CSV opens with odd columns | Open it in a spreadsheet app and check the comma-separated format. |
 | Answers disappeared | Answers save in the browser’s local storage. Clearing site data or using a different device will remove them. |
 
-## Answer keys
+## Answer Keys
 
 Sample answers and look-fors are in [ANSWER-KEYS.md](ANSWER-KEYS.md). Because the charts use live class data, the exact numbers will change. The answer keys focus on reasoning and evidence rather than one fixed number.
 
-## Quick links
+## Quick Links
 
 - [Project overview](README.md)
 - [Backend setup](BACKEND.md)
