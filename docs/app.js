@@ -829,8 +829,8 @@
         "<span><strong>Data Dunkers</strong> Junior</span>" +
         '<span class="footer-links">' +
           '<a href="' + prefix + 'activities/index.html">Activities</a>' +
-          '<a href="' + prefix + '../TEACHER-GUIDE.md">Teacher guide</a>' +
-          '<a href="' + prefix + '../ANSWER-KEYS.md">Answer keys</a>' +
+          '<a href="https://github.com/Data-Dunkers/jr/blob/main/TEACHER-GUIDE.md">Teacher guide</a>' +
+          '<a href="https://github.com/Data-Dunkers/jr/blob/main/ANSWER-KEYS.md">Answer keys</a>' +
           '<a href="' + prefix + 'index.html">Home</a>' +
         "</span>" +
       "</div>";
